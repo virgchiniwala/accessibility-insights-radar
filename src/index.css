@@ -2,39 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Oobee Design System - WCAG 2.1 AA Compliant Colors */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Oobee Brand Colors */
+    --primary: 275 54% 43%; /* #7032AC */
+    --primary-hover: 300 100% 45%; /* #E200E5 */
+    --primary-active: 277 48% 32%; /* #552A7B */
+    --primary-foreground: 0 0% 100%; /* White text on purple */
 
+    /* Accessibility Colors */
+    --focus-ring: 215 100% 40%; /* #0066CC */
+    --must-fix: 0 100% 40%; /* #CC0000 */
+    --should-fix: 51 100% 50%; /* #FFD700 */
+    --nice-to-have: 0 0% 50%; /* #808080 */
+
+    /* Neutral Colors */
+    --background: 0 0% 100%; /* #FFFFFF */
+    --surface: 0 0% 96%; /* #F5F5F5 */
+    --foreground: 0 0% 13%; /* #212121 */
+    --muted-foreground: 0 0% 45%; /* #737373 */
+
+    /* Component Colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 13%;
+    --border: 0 0% 89%; /* #E3E3E3 */
+    --input: 0 0% 89%;
+    --ring: 275 54% 43%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
+    /* Secondary & Utility */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 13%;
+    --muted: 0 0% 96%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 13%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --destructive-foreground: 0 0% 100%;
 
     --radius: 0.5rem;
 
@@ -100,6 +104,30 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+    line-height: 1.2;
+  }
+
+  h1 { font-size: 56px; }
+  h2 { font-size: 32px; }
+  h3 { font-size: 24px; }
+
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--focus-ring));
+    outline-offset: 2px;
+  }
+
+  /* Button focus styles */
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid hsl(var(--focus-ring));
+    outline-offset: 2px;
   }
 }

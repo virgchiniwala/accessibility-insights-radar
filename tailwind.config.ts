@@ -18,15 +18,28 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'body': ['PT Sans', 'sans-serif'],
+				'heading': ['DM Serif Text', 'serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				surface: 'hsl(var(--surface))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
+					hover: 'hsl(var(--primary-hover))',
+					active: 'hsl(var(--primary-active))',
 					foreground: 'hsl(var(--primary-foreground))'
+				},
+				focus: 'hsl(var(--focus-ring))',
+				severity: {
+					'must-fix': 'hsl(var(--must-fix))',
+					'should-fix': 'hsl(var(--should-fix))',
+					'nice-to-have': 'hsl(var(--nice-to-have))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
