@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import { Info } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -25,4 +26,19 @@ const TooltipContent = React.forwardRef<
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+const GlossaryTooltip = ({ term, definition }: { term: string; definition: string }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <button className="inline-flex items-center text-muted-foreground hover:text-foreground">
+        <Info className="h-4 w-4" />
+      </button>
+    </TooltipTrigger>
+    <TooltipContent className="max-w-xs">
+      <div>
+        <div className="font-semibold mb-1">{term}</div>
+        <div className="text-sm">{definition}</div>
+      </div>
+    </TooltipContent>
+  </Tooltip>
+)
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, GlossaryTooltip }
