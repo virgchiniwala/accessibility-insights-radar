@@ -8,7 +8,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronDown, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import oobeeLogoUrl from "@/assets/oobee-logo.png";
+import oobeeLogoUrl from "@/assets/oobee_logo.png";
 
 export function GlobalNav() {
   const location = useLocation();
@@ -22,16 +22,17 @@ export function GlobalNav() {
           <Link to="/" className="flex items-center gap-3">
             <img 
               src={oobeeLogoUrl} 
-              alt="Oobee Logo" 
+              alt="Oobee logo" 
+              height="32"
               className="h-8 w-auto"
             />
           </Link>
           
           <nav className="flex items-center gap-6">
             <Link 
-              to="/" 
+              to="/reports" 
               className={`text-base font-medium transition-colors hover:text-primary ${
-                isActive("/") ? "text-primary" : "text-foreground"
+                isActive("/reports") ? "text-primary" : "text-foreground"
               }`}
             >
               Reports

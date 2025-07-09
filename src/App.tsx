@@ -8,6 +8,8 @@ import ReportDetails from "./pages/ReportDetails";
 import IssueDetailExport from "./pages/IssueDetailExport";
 import ScanHistoryComparison from "./pages/ScanHistoryComparison";
 import AgencyDashboardBeta from "./pages/AgencyDashboardBeta";
+import ScanHome from "./pages/ScanHome";
+import ScanHomeFocus from "./pages/ScanHomeFocus";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,7 +21,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<ReportHighlights />} />
+          <Route path="/" element={<ScanHome />} />
+          <Route path="/scan-focus" element={<ScanHomeFocus />} />
+          <Route path="/reports" element={<ReportHighlights />} />
           <Route path="/report-details" element={<ReportDetails />} />
           <Route path="/issue-detail" element={<IssueDetailExport />} />
           <Route path="/history" element={<ScanHistoryComparison />} />
