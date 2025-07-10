@@ -232,72 +232,43 @@ export default function AgencyDashboard() {
           </CardContent>
         </Card>
 
-        {/* Engagement Support Banner */}
-        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
+        {/* Your Next Milestone */}
+        <Card className="bg-green-50 border-green-200">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <Users className="h-6 w-6 text-orange-600 flex-shrink-0 mt-1" />
               <div className="flex-1">
-                <h3 className="font-semibold text-orange-800 mb-2">Support Low-Engagement Agencies</h3>
-                <p className="text-orange-700 mb-4">
-                  {agencies.filter(a => a.scansRun < 5).length} agencies have run fewer than 5 scans. 
-                  Consider reaching out with additional support and training resources.
+                <h3 className="font-semibold text-green-800 mb-2">Your Next Milestone</h3>
+                <p className="text-green-700 mb-4">
+                  Fix 34 more issues to reach Gold Standard (90% accessibility score).
                 </p>
-                <Button variant="secondary" className="bg-white hover:bg-orange-50 border-orange-200">
-                  <Mail className="h-4 w-4" />
-                  Invite to onboarding workshop
+                <Button variant="default">
+                  View open must-fix issues
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="h-4 w-4" />
-                Schedule cross-agency training session
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <TrendingUp className="h-4 w-4" />
-                Generate monthly accessibility report
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Award className="h-4 w-4" />
-                Review badge criteria and awards
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span>Ministry of Health completed scan</span>
-                <span className="text-muted-foreground">2 hours ago</span>
-              </div>
-              <div className="flex justify-between">
-                <span>IRAS fixed 12 accessibility issues</span>
-                <span className="text-muted-foreground">5 hours ago</span>
-              </div>
-              <div className="flex justify-between">
-                <span>SportSG earned "Rising Star" badge</span>
-                <span className="text-muted-foreground">1 day ago</span>
-              </div>
-              <div className="flex justify-between">
-                <span>NEA requested training resources</span>
-                <span className="text-muted-foreground">2 days ago</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Next Steps */}
+        <Card className="bg-blue-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-blue-800">Next Steps</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button variant="outline" className="w-full justify-between border-blue-200 hover:bg-primary-hover hover:border-primary-hover hover:text-white">
+              Run monthly scan now
+              <TrendingUp className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" className="w-full justify-between border-blue-200 hover:bg-primary-hover hover:border-primary-hover hover:text-white">
+              Download vendor report (PDF)
+              <TrendingUp className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" className="w-full justify-between border-blue-200 hover:bg-primary-hover hover:border-primary-hover hover:text-white">
+              Invite teammate
+              <TrendingUp className="h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );
