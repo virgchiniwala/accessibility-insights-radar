@@ -11,6 +11,8 @@ import AgencyDashboardBeta from "./pages/AgencyDashboardBeta";
 import ScanHome from "./pages/ScanHome";
 import ScanHomeFocus from "./pages/ScanHomeFocus";
 import NotFound from "./pages/NotFound";
+import ReportDetailsWithHelper from "./pages/ReportDetailsWithHelper";
+import ReportDetailsWithModal from "./pages/ReportDetailsWithModal";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/issue-detail" element={<IssueDetailExport />} />
           <Route path="/history" element={<ScanHistoryComparison />} />
           <Route path="/dashboard" element={<AgencyDashboardBeta />} />
+          <Route path="/report-helper" element={<ReportDetailsWithHelper />} />
+          <Route path="/report-modal" element={<ReportDetailsWithModal />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
