@@ -101,7 +101,7 @@ export default function ScanHome() {
                       <Checkbox 
                         id="screenshots" 
                         checked={includeScreenshots}
-                        onCheckedChange={setIncludeScreenshots}
+                        onCheckedChange={(checked) => setIncludeScreenshots(checked === true)}
                       />
                       <Label htmlFor="screenshots" className="text-sm">Include Screenshots</Label>
                     </div>
@@ -110,7 +110,7 @@ export default function ScanHome() {
                       <Checkbox 
                         id="subdomains" 
                         checked={includeSubdomains}
-                        onCheckedChange={setIncludeSubdomains}
+                        onCheckedChange={(checked) => setIncludeSubdomains(checked === true)}
                       />
                       <Label htmlFor="subdomains" className="text-sm">Include Subdomains</Label>
                     </div>
@@ -119,7 +119,7 @@ export default function ScanHome() {
                       <Checkbox 
                         id="custom-checks" 
                         checked={customChecks}
-                        onCheckedChange={setCustomChecks}
+                        onCheckedChange={(checked) => setCustomChecks(checked === true)}
                       />
                       <Label htmlFor="custom-checks" className="text-sm">Custom Accessibility Checks</Label>
                     </div>
@@ -128,7 +128,7 @@ export default function ScanHome() {
                       <Checkbox 
                         id="wcag-aaa" 
                         checked={wcagAAA}
-                        onCheckedChange={setWcagAAA}
+                        onCheckedChange={(checked) => setWcagAAA(checked === true)}
                       />
                       <Label htmlFor="wcag-aaa" className="text-sm">Enable WCAG AAA Standards</Label>
                     </div>
