@@ -107,128 +107,128 @@ export default function ReportDetailsWithHelper() {
                 <TabsTrigger value="highlights">Highlights</TabsTrigger>
                 <TabsTrigger value="all-details">All Details</TabsTrigger>
               </TabsList>
-            </Tabs>
-          </div>
-
-          <TabsContent value="all-details" className="space-y-6">
-            {/* Search */}
-            <div className="flex gap-4 items-center">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search issues..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            {/* Issues Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle>All Detected Issues</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Table Header */}
-                  <div className="grid grid-cols-12 gap-4 pb-3 border-b border-border text-sm font-medium text-muted-foreground">
-                    <div className="col-span-2">Rule ID</div>
-                    <div className="col-span-4">Issue Title</div>
-                    <div className="col-span-2">Severity</div>
-                    <div className="col-span-2">Pages Affected</div>
-                    <div className="col-span-2">Who Can Fix</div>
+              
+              <TabsContent value="all-details" className="space-y-6">
+                {/* Search */}
+                <div className="flex gap-4 items-center">
+                  <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search issues..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
                   </div>
+                </div>
 
-                  {/* Table Rows */}
-                  {filteredIssues.map((issue) => (
-                    <div key={issue.id} className="grid grid-cols-12 gap-4 p-4 border border-border rounded-lg hover:bg-surface/50 transition-colors">
-                      <div className="col-span-2">
-                        <span className="font-mono text-sm text-muted-foreground">{issue.id}</span>
-                        <div className="text-xs text-muted-foreground mt-1">{issue.rule}</div>
+                {/* Issues Table */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>All Detected Issues</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Table Header */}
+                      <div className="grid grid-cols-12 gap-4 pb-3 border-b border-border text-sm font-medium text-muted-foreground">
+                        <div className="col-span-2">Rule ID</div>
+                        <div className="col-span-4">Issue Title</div>
+                        <div className="col-span-2">Severity</div>
+                        <div className="col-span-2">Pages Affected</div>
+                        <div className="col-span-2">Who Can Fix</div>
                       </div>
-                      
-                      <div className="col-span-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold mb-1">{issue.title}</h3>
-                            <p className="text-sm text-muted-foreground">{issue.description}</p>
+
+                      {/* Table Rows */}
+                      {filteredIssues.map((issue) => (
+                        <div key={issue.id} className="grid grid-cols-12 gap-4 p-4 border border-border rounded-lg hover:bg-surface/50 transition-colors">
+                          <div className="col-span-2">
+                            <span className="font-mono text-sm text-muted-foreground">{issue.id}</span>
+                            <div className="text-xs text-muted-foreground mt-1">{issue.rule}</div>
                           </div>
-                          {issue.hasAiHelper && (
-                            <div className="flex items-center gap-2">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button 
-                                      size="sm" 
-                                      className="h-8 px-3 text-sm bg-primary text-primary-foreground hover:bg-primary-hover"
-                                    >
-                                      <Sparkles className="h-3 w-3 mr-1" />
-                                      Auto-Generate Alt Text (Beta)
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p className="max-w-xs">Experimental: uses AI to draft descriptive alt text. Please review before applying.</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                              <span className="text-lg">🔬</span>
+                          
+                          <div className="col-span-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="font-semibold mb-1">{issue.title}</h3>
+                                <p className="text-sm text-muted-foreground">{issue.description}</p>
+                              </div>
+                              {issue.hasAiHelper && (
+                                <div className="flex items-center gap-2">
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button 
+                                          size="sm" 
+                                          className="h-8 px-3 text-sm bg-primary text-primary-foreground hover:bg-primary-hover"
+                                        >
+                                          <Sparkles className="h-3 w-3 mr-1" />
+                                          Auto-Generate Alt Text (Beta)
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p className="max-w-xs">Experimental: uses AI to draft descriptive alt text. Please review before applying.</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                  <span className="text-lg">🔬</span>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
+                          
+                          <div className="col-span-2 flex items-start">
+                            <SeverityBadge severity={issue.severity} />
+                          </div>
+                          
+                          <div className="col-span-2 flex items-start">
+                            <div className="text-center">
+                              <div className="font-semibold text-lg">{issue.pages}</div>
+                              <div className="text-xs text-muted-foreground">pages</div>
+                            </div>
+                          </div>
+                          
+                          <div className="col-span-2 flex items-start">
+                            <Button
+                              variant="pill"
+                              size="sm"
+                              className="bg-secondary text-secondary-foreground"
+                            >
+                              {issue.whoCanFix}
+                            </Button>
+                          </div>
                         </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* WCAG Compliance Overview */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>WCAG Compliance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span>WCAG (A & AA) Passes</span>
+                        <span className="font-semibold">17 / 20 of automated checks</span>
                       </div>
-                      
-                      <div className="col-span-2 flex items-start">
-                        <SeverityBadge severity={issue.severity} />
+                      <div className="w-full bg-surface rounded-full h-3">
+                        <div 
+                          className="bg-primary h-3 rounded-full transition-all duration-300" 
+                          style={{ width: "85%" }}
+                        ></div>
                       </div>
-                      
-                      <div className="col-span-2 flex items-start">
-                        <div className="text-center">
-                          <div className="font-semibold text-lg">{issue.pages}</div>
-                          <div className="text-xs text-muted-foreground">pages</div>
-                        </div>
-                      </div>
-                      
-                      <div className="col-span-2 flex items-start">
-                        <Button
-                          variant="pill"
-                          size="sm"
-                          className="bg-secondary text-secondary-foreground"
-                        >
-                          {issue.whoCanFix}
-                        </Button>
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>85% compliance</span>
+                        <a href="#" className="text-primary hover:underline">More details →</a>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* WCAG Compliance Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle>WCAG Compliance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span>WCAG (A & AA) Passes</span>
-                  <span className="font-semibold">17 / 20 of automated checks</span>
-                </div>
-                <div className="w-full bg-surface rounded-full h-3">
-                  <div 
-                    className="bg-primary h-3 rounded-full transition-all duration-300" 
-                    style={{ width: "85%" }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>85% compliance</span>
-                  <a href="#" className="text-primary hover:underline">More details →</a>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </main>
     </div>
