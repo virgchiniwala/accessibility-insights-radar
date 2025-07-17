@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 
 export default function ScanHome() {
   const [url, setUrl] = useState("");
@@ -18,14 +19,15 @@ export default function ScanHome() {
   const [wcagAAA, setWcagAAA] = useState(false);
   const [activeScansExpanded, setActiveScansExpanded] = useState(false);
   const [scanReportsExpanded, setScanReportsExpanded] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleScan = () => {
-    console.log("Starting scan for:", url);
+  const handleContinue = () => {
+    setIsModalOpen(true);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleScan();
+      handleContinue();
     }
   };
 
@@ -136,15 +138,19 @@ export default function ScanHome() {
                 </div>
               )}
 
-              {/* Scan Button */}
-              <div className="text-center">
+              {/* Continue Button */}
+              <div className="text-center space-y-2">
                 <Button 
-                  onClick={handleScan}
+                  id="btnContinue"
+                  onClick={handleContinue}
                   disabled={!url.trim()}
                   className="px-8"
                 >
-                  Scan
+                  Continue →
                 </Button>
+                <p className="text-xs text-muted-foreground">
+                  You'll verify your work email next (OTP) before the scan starts.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -255,6 +261,11 @@ export default function ScanHome() {
           </div>
         </div>
       </main>
+      
+      <EmailVerificationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 }
