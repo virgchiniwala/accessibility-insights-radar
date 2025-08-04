@@ -220,14 +220,20 @@ export default function ScanHistoryNew() {
                         <Link to="/report-details">
                           <Button variant="ghost" size="sm">
                             View Report
-                          </Button>
+                        {scan.changes?.shouldFix !== null && scan.changes?.shouldFix !== undefined && (
+                          <DiffBadge change={scan.changes.shouldFix} />
+                        )}
                         </Link>
                         {index < scanHistory.length - 1 && (
                           <Link to="/history-comparison">
                             <Button variant="ghost" size="sm">
                               Compare with Previous
                             </Button>
-                          </Link>
+                        {scan.changes?.mustFix !== null && scan.changes?.mustFix !== undefined && (
+                          <DiffBadge change={scan.changes.mustFix} />
+                        {scan.changes?.niceToHave !== null && scan.changes?.niceToHave !== undefined && (
+                          <DiffBadge change={scan.changes.niceToHave} />
+                        )}
                         )}
                       </div>
                     </div>

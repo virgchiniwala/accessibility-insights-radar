@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { GlobalNav } from "@/components/GlobalNav";
+import { WCAGComplianceCard } from "@/components/WCAGComplianceCard";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,9 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertTriangle, Search, Link2, Download, FileText, FileSpreadsheet, ExternalLink } from "lucide-react";
+import { AlertTriangle, Search, Link2, Download, FileText, FileSpreadsheet, ExternalLink, Sparkles, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const topIssues = [
@@ -47,7 +47,8 @@ const allIssues = [
     severity: "must-fix" as const,
     pages: 42,
     roles: ["Content Author", "Developer"],
-    description: "Screen readers cannot describe images to visually impaired users"
+    description: "Screen readers cannot describe images to visually impaired users",
+    hasAiHelper: true
   },
   {
     id: 2,
@@ -56,7 +57,8 @@ const allIssues = [
     severity: "must-fix" as const,
     pages: 18,
     roles: ["Developer"],
-    description: "Form fields cannot be identified by assistive technologies"
+    description: "Form fields cannot be identified by assistive technologies",
+    hasAiHelper: false
   },
   {
     id: 3,
@@ -65,7 +67,8 @@ const allIssues = [
     severity: "should-fix" as const,
     pages: 28,
     roles: ["Designer"],
-    description: "Text may be difficult to read for users with visual impairments"
+    description: "Text may be difficult to read for users with visual impairments",
+    hasAiHelper: true
   },
   {
     id: 4,
@@ -74,7 +77,8 @@ const allIssues = [
     severity: "should-fix" as const,
     pages: 15,
     roles: ["Developer", "Designer"],
-    description: "Keyboard users cannot see which element has focus"
+    description: "Keyboard users cannot see which element has focus",
+    hasAiHelper: false
   },
   {
     id: 5,
@@ -83,14 +87,15 @@ const allIssues = [
     severity: "nice-to-have" as const,
     pages: 23,
     roles: ["Content Author"],
-    description: "Screen readers rely on proper heading structure for navigation"
+    description: "Screen readers rely on proper heading structure for navigation",
+    hasAiHelper: false
   }
 ];
 
 const roleChipColors = {
-  "Developer": "bg-blue-100 text-blue-800 border-blue-300",
-  "Designer": "bg-purple-100 text-purple-800 border-purple-300",
-  "Content Author": "bg-green-100 text-green-800 border-green-300"
+  "Developer": "bg-[#D0E4FF] text-blue-800 border-blue-300",
+  "Designer": "bg-[#F4E0FF] text-purple-800 border-purple-300", 
+  "Content Author": "bg-[#CFF9E6] text-green-800 border-green-300"
 };
 
 export default function ReportDetail() {
@@ -161,6 +166,14 @@ export default function ReportDetail() {
             </TabsList>
 
             <TabsContent value="highlights" className="mt-8 space-y-8">
+              {/* WCAG Compliance Card */}
+              <WCAGComplianceCard 
+                passedChecks={17}
+                totalChecks={20}
+                overallCompliance={85}
+                variant="needs-improvement"
+              />
+
               {/* Top 3 Issues Card */}
               <Card className="shadow-oobee bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
                 <CardHeader className="pb-4">
@@ -202,22 +215,72 @@ export default function ReportDetail() {
                 </CardContent>
               </Card>
 
-              {/* WCAG Compliance */}
+              {/* Issues Requiring Attention */}
               <Card className="shadow-oobee">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-heading">WCAG 2.1 AA Compliance</CardTitle>
+                  <CardTitle className="text-2xl font-heading">Issues Requiring Attention</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-medium">Overall Compliance</span>
-                      <span className="text-2xl font-bold text-primary">85%</span>
-                    </div>
-                    <Progress value={85} className="h-2" />
-                    <p className="text-sm text-muted-foreground">
-                      Your website meets 85% of WCAG 2.1 AA accessibility guidelines
-                    </p>
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Issue</TableHead>
+                        <TableHead>AI Fix</TableHead>
+                        <TableHead>Severity</TableHead>
+                        <TableHead>Pages</TableHead>
+                        <TableHead>Who Can Fix</TableHead>
+                        <TableHead></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allIssues.map((issue) => (
+                        <TableRow key={issue.id} className="hover:bg-surface">
+                          <TableCell>
+                            <div>
+                              <p className="font-medium text-foreground">{issue.title}</p>
+                              <p className="text-sm text-muted-foreground">{issue.rule}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {issue.hasAiHelper ? (
+                              <Badge className="bg-primary/10 text-primary border-primary/20">
+                                <Sparkles className="mr-1 h-3 w-3" />
+                                AI Fix
+                              </Badge>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">—</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <SeverityBadge severity={issue.severity} />
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{issue.pages} pages</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {issue.roles.map((role) => (
+                                <span
+                                  key={role}
+                                  className={`px-2 py-1 text-xs font-medium rounded-md border ${roleChipColors[role as keyof typeof roleChipColors]}`}
+                                >
+                                  {role}
+                                </span>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Link to="/issue-detail">
+                              <Button variant="ghost" size="sm">
+                                View Details
+                                <ChevronRight className="ml-1 h-3 w-3" />
+                              </Button>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -242,6 +305,7 @@ export default function ReportDetail() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Issue</TableHead>
+                      <TableHead>AI Fix</TableHead>
                       <TableHead>Severity</TableHead>
                       <TableHead>Pages</TableHead>
                       <TableHead>Who Can Fix</TableHead>
@@ -256,6 +320,16 @@ export default function ReportDetail() {
                             <p className="font-medium text-foreground">{issue.title}</p>
                             <p className="text-sm text-muted-foreground">{issue.rule}</p>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          {issue.hasAiHelper ? (
+                            <Badge className="bg-primary/10 text-primary border-primary/20">
+                              <Sparkles className="mr-1 h-3 w-3" />
+                              AI Fix
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">—</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <SeverityBadge severity={issue.severity} />
@@ -279,6 +353,7 @@ export default function ReportDetail() {
                           <Link to="/issue-detail">
                             <Button variant="ghost" size="sm">
                               View Details
+                              <ChevronRight className="ml-1 h-3 w-3" />
                             </Button>
                           </Link>
                         </TableCell>

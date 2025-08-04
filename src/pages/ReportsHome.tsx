@@ -43,16 +43,16 @@ export default function ReportsHome() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-5xl font-heading font-normal text-foreground mb-4">
-                Past Scans
+                Reports
               </h1>
               <p className="text-lg text-muted-foreground">
                 Review your accessibility scan history and reports
               </p>
             </div>
             
-            <Link to="/report-details">
+            <Link to="/">
               <Button size="lg" className="bg-primary hover:bg-primary-hover text-primary-foreground">
-                View Latest Report
+                Run New Scan
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>

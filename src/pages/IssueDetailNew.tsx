@@ -1,8 +1,10 @@
 import { GlobalNav } from "@/components/GlobalNav";
+import { AIHelperCard } from "@/components/AIHelperCard";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, CheckCircle, XCircle, ExternalLink, Target, Users, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -16,6 +18,9 @@ const affectedPages = [
 ];
 
 export default function IssueDetailNew() {
+  const [showAIHelper, setShowAIHelper] = useState(false);
+  const hasAiHelper = true; // This issue has AI helper available
+  
   return (
     <div className="min-h-screen bg-background">
       <GlobalNav />
@@ -61,9 +66,9 @@ export default function IssueDetailNew() {
           </Card>
 
           {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Left Column - Code Example */}
-            <Card className="shadow-oobee">
+            <Card className="shadow-oobee lg:col-span-2">
               <CardHeader>
                 <CardTitle className="text-2xl font-heading flex items-center gap-2">
                   <code className="text-sm bg-muted px-2 py-1 rounded">&lt;/&gt;</code>
@@ -106,8 +111,15 @@ export default function IssueDetailNew() {
               </CardContent>
             </Card>
 
-            {/* Right Column - Guides Stack */}
+            {/* Right Column - AI Helper + Guides */}
             <div className="space-y-6">
+              {/* AI Helper Card */}
+              <AIHelperCard 
+                hasHelper={hasAiHelper}
+                issueType="Alt Text"
+                onOpenHelper={() => setShowAIHelper(true)}
+              />
+
               {/* Step-by-Step Guide */}
               <Card className="shadow-oobee">
                 <CardHeader>
@@ -232,6 +244,72 @@ export default function IssueDetailNew() {
           </Card>
         </div>
       </main>
+      
+      {/* AI Helper Modal */}
+      <Dialog open={showAIHelper} onOpenChange={setShowAIHelper}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-heading flex items-center gap-2">
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-primary-foreground" />
+              </div>
+              AI-Suggested Fix
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            <p className="text-muted-foreground">
+              AI has analyzed your images and generated descriptive alt text suggestions.
+            </p>
+            
+            <div className="space-y-4">
+              <Card className="border border-border">
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    <p className="font-medium">chart-healthcare.png</p>
+                    <div className="bg-surface p-3 rounded">
+                      <p className="text-sm font-mono">
+                        "Healthcare spending increased 15% from 2020 to 2024, shown in blue bars on chart"
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border border-border">
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    <p className="font-medium">ministry-building.jpg</p>
+                    <div className="bg-surface p-3 rounded">
+                      <p className="text-sm font-mono">
+                        "Ministry building with Singapore flag, welcoming citizens to government services"
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">👍 Helpful</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" onClick={() => setShowAIHelper(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => setShowAIHelper(false)}
+                  className="bg-primary hover:bg-primary-hover text-primary-foreground"
+                >
+                  Apply Suggestions
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

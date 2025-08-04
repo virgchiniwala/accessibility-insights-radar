@@ -154,6 +154,17 @@
   button:active,
   [role="button"]:active {
     transform: scale(0.97);
+    transition: transform 120ms ease-out;
+  }
+
+  /* Modal fade in animation */
+  .modal-fade-in {
+    animation: fadeIn 120ms ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   /* Shadow utility */
