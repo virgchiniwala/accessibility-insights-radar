@@ -8,15 +8,15 @@ interface SeverityBadgeProps {
 const severityConfig = {
   "must-fix": {
     label: "Must Fix",
-    className: "bg-severity-must-fix text-white"
+    className: "bg-error text-white font-semibold"
   },
   "should-fix": {
     label: "Should Fix", 
-    className: "bg-severity-should-fix text-black"
+    className: "bg-warning text-black font-semibold"
   },
   "nice-to-have": {
     label: "Nice to Have",
-    className: "bg-severity-nice-to-have text-white"
+    className: "bg-info text-white font-semibold"
   }
 };
 
