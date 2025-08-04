@@ -35,11 +35,14 @@ export default {
 					active: 'hsl(var(--primary-active))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
-				focus: 'hsl(var(--focus-ring))',
+				focus: 'hsl(var(--focus))',
+				error: 'hsl(var(--error))',
+				warning: 'hsl(var(--warning))',
+				info: 'hsl(var(--info))',
 				severity: {
-					'must-fix': 'hsl(var(--must-fix))',
-					'should-fix': 'hsl(var(--should-fix))',
-					'nice-to-have': 'hsl(var(--nice-to-have))'
+					'must-fix': 'hsl(var(--error))',
+					'should-fix': 'hsl(var(--warning))',
+					'nice-to-have': 'hsl(var(--info))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -80,6 +83,9 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			boxShadow: {
+				'oobee': 'var(--shadow)'
 			},
 			keyframes: {
 				'accordion-down': {

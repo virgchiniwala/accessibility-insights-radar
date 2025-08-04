@@ -2,34 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Oobee Design System - WCAG 2.1 AA Compliant Colors */
+/* Oobee Design System - A11y Brand Colors */
 
 @layer base {
   :root {
-    /* Oobee Brand Colors */
-    --primary: 275 54% 43%; /* #7032AC */
-    --primary-hover: 300 100% 45%; /* #E200E5 */
-    --primary-active: 277 48% 32%; /* #552A7B */
+    /* A11y Brand Colors */
+    --primary: 275 54% 43%; /* #7032AC - A11y Purple /100 */
+    --primary-hover: 300 100% 45%; /* #E200E5 - A11y Purple /Highlight */
+    --primary-active: 277 48% 32%; /* #552A7B - A11y Purple /150 */
     --primary-foreground: 0 0% 100%; /* White text on purple */
 
-    /* Accessibility Colors */
-    --focus-ring: 215 100% 40%; /* #0066CC */
-    --must-fix: 0 100% 40%; /* #CC0000 */
-    --should-fix: 51 100% 50%; /* #FFD700 */
-    --nice-to-have: 0 0% 50%; /* #808080 */
+    /* Accessibility Colors - WCAG 2.1 AA Compliant */
+    --focus: 277 48% 32%; /* #552A7B - Focus ring color */
+    --error: 348 100% 39%; /* #C4000E - A11y Red /100 (Must Fix) */
+    --warning: 51 100% 50%; /* #FFC700 - A11y Yellow /100 (Should Fix) */
+    --info: 0 0% 43%; /* #6E6E6E - A11y Grey /70 (Nice to Have) */
 
     /* Neutral Colors */
-    --background: 0 0% 100%; /* #FFFFFF */
-    --surface: 0 0% 96%; /* #F5F5F5 */
+    --background: 0 0% 100%; /* #FFFFFF - A11y White */
+    --surface: 0 0% 96%; /* #F5F5F5 - A11y Black /05 */
     --foreground: 0 0% 13%; /* #212121 */
-    --muted-foreground: 0 0% 45%; /* #737373 */
+    --muted-foreground: 0 0% 43%; /* #6E6E6E */
 
     /* Component Colors */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 13%;
     --border: 0 0% 89%; /* #E3E3E3 */
     --input: 0 0% 89%;
-    --ring: 275 54% 43%;
+    --ring: 277 48% 32%; /* Focus ring */
 
     /* Secondary & Utility */
     --secondary: 0 0% 96%;
@@ -37,10 +37,12 @@
     --muted: 0 0% 96%;
     --accent: 0 0% 96%;
     --accent-foreground: 0 0% 13%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 348 100% 39%; /* A11y Red */
     --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    /* Design tokens */
+    --radius: 0.5rem; /* 8px border radius */
+    --shadow: 0 2px 4px 0 hsl(0 0% 0% / 0.1); /* 0 2 4 0 #0000001A */
 
     --sidebar-background: 0 0% 98%;
 
@@ -118,16 +120,44 @@
   h2 { font-size: 32px; }
   h3 { font-size: 24px; }
 
-  /* Focus styles for accessibility */
+  /* Focus styles for accessibility - WCAG 2.1 AA */
   *:focus-visible {
-    outline: 2px solid hsl(var(--focus-ring));
+    outline: 2px solid hsl(var(--focus));
     outline-offset: 2px;
   }
 
   /* Button focus styles */
   button:focus-visible,
   [role="button"]:focus-visible {
-    outline: 2px solid hsl(var(--focus-ring));
+    outline: 2px solid hsl(var(--focus));
     outline-offset: 2px;
+  }
+
+  /* Typography - A11y Brand Specifications */
+  body {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 16px;
+    line-height: 24px; /* 1.5 */
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Serif Text', serif;
+    line-height: 1.2;
+  }
+
+  /* Typography scale */
+  h1 { font-size: 56px; }
+  h2 { font-size: 40px; }
+  h3 { font-size: 32px; }
+
+  /* Interaction styles */
+  button:active,
+  [role="button"]:active {
+    transform: scale(0.97);
+  }
+
+  /* Shadow utility */
+  .shadow-oobee {
+    box-shadow: var(--shadow);
   }
 }
