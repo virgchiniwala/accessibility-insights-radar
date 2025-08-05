@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { GlobalNav } from "@/components/GlobalNav";
 import { AIHelperCard } from "@/components/AIHelperCard";
 import { SeverityBadge } from "@/components/SeverityBadge";
