@@ -200,3 +200,5 @@ export function ScanHistoryNew() {
     </Layout>
   );
 }
+
+export default ScanHistoryNew
