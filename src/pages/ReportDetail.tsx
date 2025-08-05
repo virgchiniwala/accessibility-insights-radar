@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertTriangle, Search, Link2, Download, FileText, FileSpreadsheet, ExternalLink, Sparkles, ChevronRight } from "lucide-react";
+import { AlertTriangle, Search, Link2, Download, FileText, FileSpreadsheet, ExternalLink, Zap, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const topIssues = [
@@ -168,9 +168,7 @@ export default function ReportDetail() {
             <TabsContent value="highlights" className="mt-8 space-y-8">
               {/* WCAG Compliance Card */}
               <WCAGComplianceCard 
-                passedChecks={17}
-                totalChecks={20}
-                overallCompliance={85}
+                score={85}
                 variant="needs-improvement"
               />
 
@@ -243,10 +241,15 @@ export default function ReportDetail() {
                           </TableCell>
                           <TableCell>
                             {issue.hasAiHelper ? (
-                              <Badge className="bg-primary/10 text-primary border-primary/20">
-                                <Sparkles className="mr-1 h-3 w-3" />
-                                AI Fix
-                              </Badge>
+                            <Button 
+                              size="sm"
+                              variant="pill"
+                              className="bg-primary text-white px-3 py-1 text-xs rounded-full hover:bg-primary-hover"
+                              onClick={() => window.location.href = '/issue-detail'}
+                            >
+                              <Zap className="mr-1 h-3 w-3" />
+                              AI Fix
+                            </Button>
                             ) : (
                               <span className="text-muted-foreground text-sm">—</span>
                             )}
@@ -291,7 +294,7 @@ export default function ReportDetail() {
                 <div className="relative max-w-md">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search issues..."
+                    placeholder="Search by rule ID or role..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -323,10 +326,15 @@ export default function ReportDetail() {
                         </TableCell>
                         <TableCell>
                           {issue.hasAiHelper ? (
-                            <Badge className="bg-primary/10 text-primary border-primary/20">
-                              <Sparkles className="mr-1 h-3 w-3" />
+                            <Button 
+                              size="sm"
+                              variant="pill"
+                              className="bg-primary text-white px-3 py-1 text-xs rounded-full hover:bg-primary-hover"
+                              onClick={() => window.location.href = '/issue-detail'}
+                            >
+                              <Zap className="mr-1 h-3 w-3" />
                               AI Fix
-                            </Badge>
+                            </Button>
                           ) : (
                             <span className="text-muted-foreground text-sm">—</span>
                           )}

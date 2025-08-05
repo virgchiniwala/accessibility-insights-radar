@@ -1,105 +1,64 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 
 interface WCAGComplianceCardProps {
-  passedChecks: number;
-  totalChecks: number;
-  overallCompliance: number;
   variant?: "pass" | "needs-improvement" | "fail";
+  score?: number;
+  className?: string;
 }
 
 export function WCAGComplianceCard({ 
-  passedChecks, 
-  totalChecks, 
-  overallCompliance,
-  variant = "needs-improvement" 
+  variant = "needs-improvement", 
+  score = 85,
+  className = ""
 }: WCAGComplianceCardProps) {
-  const failedChecks = totalChecks - passedChecks;
-  const progressPercentage = (passedChecks / totalChecks) * 100;
-  
   const getVariantStyles = () => {
     switch (variant) {
       case "pass":
         return {
-          ringColor: "text-green-600",
-          labelColor: "text-green-700",
-          labelText: "Pass",
-          subText: "All automated checks passing"
+          icon: CheckCircle,
+          iconColor: "text-green-600",
+          bgColor: "bg-green-50 border-green-200",
+          textColor: "text-green-800"
         };
       case "fail":
         return {
-          ringColor: "text-red-600", 
-          labelColor: "text-red-700",
-          labelText: "Fail",
-          subText: `${failedChecks} checks failing • Critical issues need attention`
+          icon: XCircle,
+          iconColor: "text-error",
+          bgColor: "bg-red-50 border-red-200",
+          textColor: "text-red-800"
         };
       default:
         return {
-          ringColor: "text-primary",
-          labelColor: "text-foreground",
-          labelText: "Needs Improvement", 
-          subText: `${failedChecks} checks failing • Focus on Must-Fix issues`
+          icon: AlertTriangle,
+          iconColor: "text-warning",
+          bgColor: "bg-yellow-50 border-yellow-200",
+          textColor: "text-yellow-800"
         };
     }
   };
 
-  const styles = getVariantStyles();
+  const { icon: Icon, iconColor, bgColor, textColor } = getVariantStyles();
 
   return (
-    <Card>
+    <Card className={`shadow-oobee ${bgColor} ${className}`}>
       <CardHeader>
-        <CardTitle>WCAG Compliance</CardTitle>
+        <CardTitle className="text-[32px] leading-[40px] font-heading flex items-center gap-3">
+          <Icon className={`h-6 w-6 ${iconColor}`} />
+          WCAG Compliance
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center gap-6">
-          {/* Circular Progress Ring */}
-          <div className="relative w-20 h-20">
-            <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 80 80">
-              {/* Background circle */}
-              <circle
-                cx="40"
-                cy="40"
-                r="32"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-                className="text-surface"
-              />
-              {/* Progress circle */}
-              <circle
-                cx="40"
-                cy="40"
-                r="32"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-                strokeDasharray={`${progressPercentage * 2.01} 201`}
-                className={styles.ringColor}
-                strokeLinecap="round"
-              />
-            </svg>
-            {/* Center text */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-sm font-bold text-foreground">
-                {passedChecks} / {totalChecks}
-              </span>
-            </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-lg">Overall Score</span>
+            <span className={`text-3xl font-bold ${textColor}`}>{score}%</span>
           </div>
-
-          {/* Right side content */}
-          <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-3">
-              <h3 className={`text-lg font-semibold ${styles.labelColor}`}>
-                WCAG A & AA: {styles.labelText}
-              </h3>
-              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                {overallCompliance}% overall compliance
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {styles.subText}
-            </p>
+          <Progress value={score} className="h-1" />
+          <div className="flex justify-between text-base text-muted-foreground">
+            <span>Current: {score}%</span>
+            <span className="font-semibold">Target: 90%</span>
           </div>
         </div>
       </CardContent>

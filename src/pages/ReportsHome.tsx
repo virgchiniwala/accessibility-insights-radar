@@ -42,21 +42,35 @@ export default function ReportsHome() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-5xl font-heading font-normal text-foreground mb-4">
+              <h1 className="text-[56px] leading-[64px] font-heading text-foreground mb-4">
                 Reports
               </h1>
               <p className="text-lg text-muted-foreground">
-                Review your accessibility scan history and reports
+                Track accessibility improvements across all your scans
               </p>
             </div>
             
-            <Link to="/">
-              <Button size="lg" className="bg-primary hover:bg-primary-hover text-primary-foreground">
-                Run New Scan
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <Button 
+              onClick={() => window.location.href = '/scan-modal'}
+              size="lg"
+            >
+              Run New Scan
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
+
+          {/* No scans banner */}
+          <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 mb-8">
+            <CardContent className="p-6 text-center">
+              <p className="text-lg mb-4">You haven't run a scan this month</p>
+              <Button 
+                onClick={() => window.location.href = '/scan-modal'}
+                size="lg"
+              >
+                Run one now →
+              </Button>
+            </CardContent>
+          </Card>
 
           <Card className="shadow-oobee">
             <CardHeader>
@@ -72,7 +86,11 @@ export default function ReportsHome() {
                     <TableHead>Date</TableHead>
                     <TableHead>Website</TableHead>
                     <TableHead>Issues Found</TableHead>
-                    <TableHead>WCAG Compliance</TableHead>
+                    <TableHead>
+                      <span className="cursor-help" title="85% = 17 / 20 checks passed">
+                        WCAG Compliance
+                      </span>
+                    </TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead></TableHead>
                   </TableRow>
@@ -111,7 +129,7 @@ export default function ReportsHome() {
                       <TableCell>
                         <Link to="/report-details">
                           <Button variant="ghost" size="sm">
-                            View Report
+                            View Latest Report →
                           </Button>
                         </Link>
                       </TableCell>
