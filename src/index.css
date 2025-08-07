@@ -146,6 +146,12 @@
     outline-offset: 2px;
   }
 
+  /* Spark line focus styles */
+  svg:focus-visible {
+    outline: 2px solid hsl(var(--focus));
+    outline-offset: 2px;
+  }
+
   /* Typography - A11y Brand Specifications */
   body {
     font-family: 'PT Sans', sans-serif;
@@ -183,5 +189,10 @@
   /* Shadow utility */
   .shadow-oobee {
     box-shadow: var(--shadow);
+  }
+
+  /* Monospace font for code */
+  .font-mono {
+    font-family: 'PT Mono', 'Courier New', monospace;
   }
 }

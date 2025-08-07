@@ -2,13 +2,18 @@ import { useState } from "react";
 import { GlobalNav } from "@/components/GlobalNav";
 import { AIHelperCard } from "@/components/AIHelperCard";
 import { SeverityBadge } from "@/components/SeverityBadge";
+import { ShareBrief } from "@/components/ShareBrief";
+import { CodeTabBar } from "@/components/CodeTabBar";
+import { GlossaryTerm } from "@/components/GlossaryHover";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CheckCircle, XCircle, ExternalLink, Target, Users, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, ExternalLink, Target, Users, Zap, Sparkles, ThumbsUp, ThumbsDown, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const affectedPages = [
   { url: "/homepage", title: "Homepage", issues: 8 },
@@ -20,7 +25,50 @@ const affectedPages = [
 
 export default function IssueDetailNew() {
   const [showAIHelper, setShowAIHelper] = useState(false);
+  const [showShareBrief, setShowShareBrief] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState([
+    {
+      image: "chart-healthcare.png",
+      suggestedAlt: "Healthcare spending increased 15% from 2020 to 2024, shown in blue bars on chart"
+    },
+    {
+      image: "ministry-building.jpg", 
+      suggestedAlt: "Ministry building with Singapore flag, welcoming citizens to government services"
+    }
+  ]);
   const hasAiHelper = true; // This issue has AI helper available
+
+  const htmlCode = `<img src="chart-healthcare.png" 
+     width="400" 
+     height="300" />
+
+<!-- Missing alt attribute -->`;
+
+  const cssCode = `img[src*="chart-healthcare"] {
+  width: 400px;
+  height: 300px;
+}
+
+/* No CSS changes needed for alt text */`;
+
+  const handleApplySuggestions = () => {
+    setShowAIHelper(false);
+    setShowShareBrief(true);
+    toast.success("Alt text applied successfully");
+    
+    // Emit helper_accepted event
+    window.dispatchEvent(new CustomEvent('helper_accepted', {
+      detail: { issueType: 'alt-text', suggestionsCount: aiSuggestions.length }
+    }));
+  };
+
+  const handleFeedback = (helpful: boolean) => {
+    // Emit helper_feedback event
+    window.dispatchEvent(new CustomEvent('helper_feedback', {
+      detail: { helpful, issueType: 'alt-text' }
+    }));
+    toast.success(helpful ? "Thanks for your feedback!" : "Feedback recorded");
+  };
   
   return (
     <div className="min-h-screen bg-background">
@@ -69,48 +117,60 @@ export default function IssueDetailNew() {
           {/* Two Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Left Column - Code Example */}
-            <Card className="shadow-oobee lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="text-2xl font-heading flex items-center gap-2">
-                  <code className="text-sm bg-muted px-2 py-1 rounded">&lt;/&gt;</code>
-                  Code Example
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Current (Wrong) */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <XCircle className="h-5 w-5 text-error" />
-                    <span className="font-semibold text-error">Current (Incorrect)</span>
-                  </div>
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <pre className="text-sm text-red-800 font-mono">
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="shadow-oobee">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-heading flex items-center gap-2">
+                    <code className="text-sm bg-muted px-2 py-1 rounded">&lt;/&gt;</code>
+                    Code Example
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CodeTabBar 
+                    htmlContent={htmlCode}
+                    cssContent={cssCode}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Current vs Fixed Examples */}
+              <Card className="shadow-oobee">
+                <CardContent className="p-6 space-y-6">
+                  {/* Current (Wrong) */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <XCircle className="h-5 w-5 text-error" />
+                      <span className="font-semibold text-error">Current (Incorrect)</span>
+                    </div>
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <pre className="text-sm text-red-800 font-mono">
 {`<img src="chart-healthcare.png" 
      width="400" 
      height="300" />`}
-                    </pre>
+                      </pre>
+                    </div>
                   </div>
-                </div>
 
-                {/* Fixed (Correct) */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    <span className="font-semibold text-green-700">Fixed (Correct)</span>
-                  </div>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <pre className="text-sm text-green-800 font-mono">
+                  {/* Fixed (Correct) */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <span className="font-semibold text-green-700">Fixed (Correct)</span>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <pre className="text-sm text-green-800 font-mono">
 {`<img src="chart-healthcare.png" 
      alt="Healthcare spending increased 
           15% from 2020 to 2024, shown 
           in blue bars on chart"
      width="400" 
      height="300" />`}
-                    </pre>
+                      </pre>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Right Column - AI Helper + Guides */}
             <div className="space-y-6">
@@ -124,7 +184,7 @@ export default function IssueDetailNew() {
               {/* Step-by-Step Guide */}
               <Card className="shadow-oobee">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-heading flex items-center gap-2">
+                  <CardTitle className="text-xl font-heading flex items-center gap-2">
                     <Users className="h-5 w-5" />
                     Step-by-Step Guide
                   </CardTitle>
@@ -166,7 +226,9 @@ export default function IssueDetailNew() {
               {/* WCAG Reference */}
               <Card className="shadow-oobee">
                 <CardHeader>
-                  <CardTitle className="text-xl font-heading">WCAG Reference</CardTitle>
+                  <CardTitle className="text-xl font-heading">
+                    <GlossaryTerm term="WCAG" /> Reference
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -180,7 +242,7 @@ export default function IssueDetailNew() {
                     </div>
                     <Button variant="ghost" className="p-0 h-auto text-primary hover:text-primary-hover">
                       <ExternalLink className="mr-2 h-4 w-4" />
-                      Read full WCAG documentation
+                      Read full <GlossaryTerm term="WCAG" /> documentation
                     </Button>
                   </div>
                 </CardContent>
@@ -212,14 +274,18 @@ export default function IssueDetailNew() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Share Brief - Hidden by default, visible after AI Helper Apply */}
+              <ShareBrief 
+                isVisible={showShareBrief}
+                briefText="Images missing alt text — AI recommends descriptive alt text for 156 images across 42 pages. Copy & share this snippet with your team."
+              />
             </div>
           </div>
 
           {/* Affected Pages Accordion */}
           <Card className="shadow-oobee">
-            <CardHeader>
-              <CardTitle className="text-2xl font-heading">Affected Pages</CardTitle>
-            </CardHeader>
+              <CardHeader>
             <CardContent>
               <Accordion type="single" collapsible>
                 <AccordionItem value="pages">
@@ -248,63 +314,97 @@ export default function IssueDetailNew() {
       
       {/* AI Helper Modal */}
       <Dialog open={showAIHelper} onOpenChange={setShowAIHelper}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto modal-fade-in">
           <DialogHeader>
             <DialogTitle className="text-2xl font-heading flex items-center gap-2">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Zap className="h-5 w-5 text-primary-foreground" />
+                <Sparkles className="h-5 w-5 text-primary-foreground" />
               </div>
-              AI-Suggested Fix
+              ✨ AI-Suggested Fix
             </DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              AI analysed {aiSuggestions.length} items – est. time saved ≈ {aiSuggestions.length * 3} min.
+            </p>
           </DialogHeader>
           
           <div className="space-y-6 py-4">
-            <p className="text-muted-foreground">
-              AI has analyzed your images and generated descriptive alt text suggestions.
-            </p>
-            
-            <div className="space-y-4">
-              <Card className="border border-border">
-                <CardContent className="p-4">
-                  <div className="space-y-3">
-                    <p className="font-medium">chart-healthcare.png</p>
-                    <div className="bg-surface p-3 rounded">
-                      <p className="text-sm font-mono">
-                        "Healthcare spending increased 15% from 2020 to 2024, shown in blue bars on chart"
-                      </p>
+            <div className="space-y-6">
+              {aiSuggestions.map((suggestion, index) => (
+                <Card key={index} className="border border-border">
+                  <CardContent className="p-6">
+                    <div className="space-y-3">
+                      <p className="font-medium text-foreground">{suggestion.image}</p>
+                      <div>
+                        <label className="text-sm font-medium text-foreground block mb-2">
+                          AI Suggested Alt Text:
+                        </label>
+                        <Textarea
+                          value={suggestion.suggestedAlt}
+                          onChange={(e) => {
+                            const newSuggestions = [...aiSuggestions];
+                            newSuggestions[index].suggestedAlt = e.target.value;
+                            setAiSuggestions(newSuggestions);
+                          }}
+                          className="min-h-[80px] resize-none font-mono text-sm"
+                          placeholder="AI-generated alt text will appear here..."
+                        />
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border border-border">
-                <CardContent className="p-4">
-                  <div className="space-y-3">
-                    <p className="font-medium">ministry-building.jpg</p>
-                    <div className="bg-surface p-3 rounded">
-                      <p className="text-sm font-mono">
-                        "Ministry building with Singapore flag, welcoming citizens to government services"
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
             
-            <div className="flex items-center justify-between pt-4 border-t">
+            {/* Button Row - Right Aligned */}
+            <div className="flex items-center justify-end gap-3 pt-6 border-t">
+              <Button 
+                variant="ghost" 
+                onClick={() => setShowAIHelper(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  // Regenerate logic here
+                  setAiSuggestions(prev => prev.map(s => ({
+                    ...s,
+                    suggestedAlt: s.suggestedAlt + " (regenerated)"
+                  })));
+                }}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Regenerate
+              </Button>
+              <Button 
+                onClick={handleApplySuggestions}
+                className="bg-primary hover:bg-primary-hover text-primary-foreground"
+              >
+                Apply Suggestions
+              </Button>
+            </div>
+
+            {/* Footer Micro-Survey */}
+            <div className="flex items-center justify-center gap-4 pt-4 border-t">
+              <span className="text-sm text-muted-foreground">Was this helpful?</span>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">👍 Helpful</span>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <Button variant="ghost" onClick={() => setShowAIHelper(false)}>
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={() => setShowAIHelper(false)}
-                  className="bg-primary hover:bg-primary-hover text-primary-foreground"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleFeedback(true)}
+                  className="h-8 px-3"
                 >
-                  Apply Suggestions
+                  <ThumbsUp className="h-4 w-4 mr-1" />
+                  👍 Helpful
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleFeedback(false)}
+                  className="h-8 px-3"
+                >
+                  <ThumbsDown className="h-4 w-4 mr-1" />
+                  👎 Not helpful
                 </Button>
               </div>
             </div>

@@ -12,10 +12,9 @@ interface GlossaryHoverProps {
 }
 
 const glossaryTerms = {
-  "WCAG": "Web Content Accessibility Guidelines - International standards for making web content accessible to people with disabilities",
-  "ARIA": "Accessible Rich Internet Applications - A set of attributes that define ways to make web content more accessible",
-  "Conformance": "Meeting all requirements of a specific accessibility standard or level",
-  "Contrast Ratio": "The difference in luminance between text and background, measured as a ratio (e.g., 4.5:1)"
+  "ARIA": "Accessible Rich Internet Applications - A set of attributes that define ways to make web content more accessible to people with disabilities",
+  "contrast": "The difference in luminance between text and background colors, measured as a ratio (e.g., 4.5:1) to ensure readability",
+  "WCAG": "Web Content Accessibility Guidelines - International standards for making web content accessible to people with disabilities"
 };
 
 export function GlossaryHover({ term, definition, className }: GlossaryHoverProps) {
@@ -23,7 +22,7 @@ export function GlossaryHover({ term, definition, className }: GlossaryHoverProp
     <Tooltip>
       <TooltipTrigger asChild>
         <button 
-          className={`inline-flex items-center text-primary underline decoration-dotted underline-offset-2 hover:text-primary-hover ${className}`}
+          className={`inline-flex items-center text-primary underline decoration-dotted underline-offset-2 hover:text-primary-hover focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 rounded ${className}`}
           aria-label={`Definition of ${term}`}
         >
           {term}

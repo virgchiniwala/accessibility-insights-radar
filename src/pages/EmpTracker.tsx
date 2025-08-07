@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   Globe, 
   TrendingUp, 
@@ -13,15 +14,46 @@ import {
   Download,
   ChartBar,
   Users,
-  AlertCircle
+  AlertCircle,
+  ArrowRight
 } from "lucide-react";
 
 const siteData = [
-  { name: "ministry.gov.sg", compliance: 92, trend: [85, 87, 89, 92], status: "excellent" },
-  { name: "agency.gov.sg", compliance: 78, trend: [70, 72, 75, 78], status: "good" },
-  { name: "portal.gov.sg", compliance: 65, trend: [60, 62, 63, 65], status: "needs-work" },
-  { name: "services.gov.sg", compliance: 88, trend: [82, 84, 86, 88], status: "good" },
-  { name: "info.gov.sg", compliance: 45, trend: [40, 42, 43, 45], status: "critical" }
+  { 
+    name: "ministry.gov.sg", 
+    compliance: 92, 
+    trend: [85, 87, 89, 92], 
+    status: "excellent",
+    sparkLine: [85, 87, 89, 92]
+  },
+  { 
+    name: "agency.gov.sg", 
+    compliance: 78, 
+    trend: [70, 72, 75, 78], 
+    status: "good",
+    sparkLine: [70, 72, 75, 78]
+  },
+  { 
+    name: "portal.gov.sg", 
+    compliance: 65, 
+    trend: [60, 62, 63, 65], 
+    status: "needs-work",
+    sparkLine: [60, 62, 63, 65]
+  },
+  { 
+    name: "services.gov.sg", 
+    compliance: 88, 
+    trend: [82, 84, 86, 88], 
+    status: "good",
+    sparkLine: [82, 84, 86, 88]
+  },
+  { 
+    name: "info.gov.sg", 
+    compliance: 45, 
+    trend: [40, 42, 43, 45], 
+    status: "critical",
+    sparkLine: [40, 42, 43, 45]
+  }
 ];
 
 const fastestImprovers = [
@@ -41,18 +73,109 @@ const leastImproved = [
 ];
 
 const unseannedSites = [
-  { name: "forgotten.gov.sg", lastScan: "78 days ago" },
-  { name: "inactive.gov.sg", lastScan: "65 days ago" },
-  { name: "outdated.gov.sg", lastScan: "62 days ago" }
+  { name: "forgotten.gov.sg", lastScan: 78 },
+  { name: "inactive.gov.sg", lastScan: 65 },
+  { name: "outdated.gov.sg", lastScan: 62 },
+  { name: "legacy.gov.sg", lastScan: 89 },
+  { name: "archive.gov.sg", lastScan: 71 }
 ];
 
-export default function EmpTracker() {
-  const [quickScanUrl, setQuickScanUrl] = useState("");
+const topRecurringIssues = [
+  { category: "Developer", count: 156, color: "#D0E4FF" },
+  { category: "Designer", count: 89, color: "#F4E0FF" },
+  { category: "Content Author", count: 67, color: "#CFF9E6" }
+];
 
+// Spark line component with keyboard navigation
+const SparkLine = ({ data, compliance }: { data: number[], compliance: number }) => {
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setFocusedIndex(prev => Math.max(0, prev - 1));
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setFocusedIndex(prev => Math.min(data.length - 1, prev + 1));
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setFocusedIndex(-1);
+      (e.target as HTMLElement).blur();
+    }
+  };
+
+  return (
+    <div className="h-12 flex items-end gap-1">
+      <svg 
+        width="100%" 
+        height="48" 
+        className="focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 rounded"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        onFocus={() => setFocusedIndex(0)}
+        onBlur={() => setFocusedIndex(-1)}
+        role="img"
+        aria-label={`Compliance trend: ${data.join(', ')}%`}
+      >
+        <g>
+          {data.map((value, index) => (
+            <rect
+              key={index}
+              x={`${(index / (data.length - 1)) * 90}%`}
+              y={48 - ((value - min) / range) * 40}
+              width="8"
+              height={((value - min) / range) * 40}
+              className={`transition-all hover:opacity-80 ${
+                focusedIndex === index 
+                  ? 'fill-primary-hover ring-2 ring-focus ring-offset-2' 
+                  : 'fill-primary'
+              }`}
+              tabIndex={-1}
+              role="button"
+              aria-label={`Month ${index + 1}: ${value}%`}
+            />
+          ))}
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+const SiteBadge = ({ site }: { site: typeof siteData[0] }) => {
   const getBadgeVariant = (compliance: number) => {
     if (compliance >= 90) return "bg-green-500 text-white";
     if (compliance >= 75) return "bg-yellow-500 text-white";
     return "bg-red-500 text-white";
+  };
+
+  return (
+    <Card className="border border-border hover:shadow-oobee transition-shadow">
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-base">{site.name}</h4>
+            <Badge 
+              className={`${getBadgeVariant(site.compliance)} font-semibold`}
+            >
+              {site.compliance}%
+            </Badge>
+          </div>
+          <SparkLine data={site.sparkLine} compliance={site.compliance} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default function EmpTracker() {
+  const [quickScanUrl, setQuickScanUrl] = useState("");
+
+  const handleScheduleScan = (siteUrl: string) => {
+    // Navigate to scan landing with pre-filled URL
+    window.location.href = `/?url=${encodeURIComponent(siteUrl)}`;
   };
 
   return (
@@ -103,34 +226,9 @@ export default function EmpTracker() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                 {siteData.map((site) => (
-                  <Card key={site.name} className="border border-border hover:shadow-oobee transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-semibold text-base">{site.name}</h4>
-                          <Badge 
-                            className={`${getBadgeVariant(site.compliance)} font-semibold`}
-                          >
-                            {site.compliance}%
-                          </Badge>
-                        </div>
-                        <div className="h-12 flex items-end gap-1">
-                          {site.trend.map((value, index) => (
-                            <div
-                              key={index}
-                              className="bg-primary rounded-sm flex-1 transition-all hover:opacity-80"
-                              style={{ height: `${(value / 100) * 48}px` }}
-                              tabIndex={0}
-                              role="button"
-                              aria-label={`Month ${index + 1}: ${value}%`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <SiteBadge key={site.name} site={site} />
                 ))}
               </div>
             </CardContent>
@@ -159,7 +257,33 @@ export default function EmpTracker() {
             </CardContent>
           </Card>
 
-          {/* Leaderboard */}
+          {/* Top Recurring Issues */}
+          <Card className="shadow-oobee mb-8">
+            <CardHeader>
+              <CardTitle className="text-[32px] leading-[40px] font-heading flex items-center gap-3">
+                <ChartBar className="h-6 w-6 text-warning" />
+                Top Recurring Issues
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {topRecurringIssues.map((issue) => (
+                  <div key={issue.category} className="flex items-center justify-between p-4 bg-surface rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: issue.color }}
+                      />
+                      <span className="font-medium">{issue.category} Issues</span>
+                    </div>
+                    <Badge variant="secondary">{issue.count} total</Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Fastest Improvers & Least Improved */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <Card className="shadow-oobee">
               <CardHeader>
@@ -229,7 +353,49 @@ export default function EmpTracker() {
               <p className="text-muted-foreground mt-2">Sites not scanned in ≥ 60 days</p>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Site</TableHead>
+                    <TableHead>Last Scan</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {unseannedSites.map((site) => (
+                    <TableRow key={site.name}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Calendar className="h-5 w-5 text-warning" />
+                          <span className="font-medium">{site.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">
+                          {site.lastScan} days ago
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="outline"
+                          onClick={() => handleScheduleScan(site.name)}
+                          className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                        >
+                          Schedule Scan
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    </div>
+  );
+}
                 {unseannedSites.map((site) => (
                   <div key={site.name} className="flex items-center justify-between p-4 bg-surface rounded-lg">
                     <div className="flex items-center gap-3">
