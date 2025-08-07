@@ -15,11 +15,8 @@ import AgencyDashboardBeta from "./pages/AgencyDashboardBeta";
 import EmpTracker from "./pages/EmpTracker";
 import NewScanModal from "./pages/NewScanModal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import ScanHome from "./pages/ScanHome";
-import ScanHomeFocus from "./pages/ScanHomeFocus";
+import ScanLanding from "./pages/ScanLanding";
 import NotFound from "./pages/NotFound";
-import ReportDetailsWithHelper from "./pages/ReportDetailsWithHelper";
-import ReportDetailsWithModal from "./pages/ReportDetailsWithModal";
 import AIHelperModalNew from "./pages/AIHelperModalNew";
 
 const queryClient = new QueryClient();
@@ -31,21 +28,17 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<ScanHome />} />
-          <Route path="/scan-focus" element={<ScanHomeFocus />} />
+          <Route path="/" element={<ScanLanding />} />
           <Route path="/reports" element={<ReportsHome />} />
-          <Route path="/report-highlights" element={<ReportHighlights />} />
           <Route path="/report-details" element={<ReportDetail />} />
           <Route path="/issue-detail" element={
             <ErrorBoundary>
               <IssueDetailNew />
             </ErrorBoundary>
           } />
+          <Route path="/ai-helper" element={<AIHelperModalNew />} />
           <Route path="/history" element={<ScanHistoryNew />} />
           <Route path="/dashboard" element={<EmpTracker />} />
-          <Route path="/scan-modal" element={<NewScanModal />} />
-          <Route path="/report-helper" element={<AIHelperModalNew />} />
-          <Route path="/report-modal" element={<ReportDetailsWithModal />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

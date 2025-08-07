@@ -9,8 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertTriangle, Search, Link2, Download, FileText, FileSpreadsheet, ExternalLink, Zap, ChevronRight } from "lucide-react";
+import { AlertTriangle, Search, Link2, Download, FileText, FileSpreadsheet, ExternalLink, Zap, ChevronRight, Info } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CategoryChip } from "@/components/CategoryChip";
+import { EffortBadge } from "@/components/EffortBadge";
 
 const topIssues = [
   {
@@ -48,7 +50,9 @@ const allIssues = [
     pages: 42,
     roles: ["Content Author", "Developer"],
     description: "Screen readers cannot describe images to visually impaired users",
-    hasAiHelper: true
+    hasAiHelper: true,
+    category: "Images" as const,
+    effort: "Easy" as const
   },
   {
     id: 2,
@@ -58,7 +62,9 @@ const allIssues = [
     pages: 18,
     roles: ["Developer"],
     description: "Form fields cannot be identified by assistive technologies",
-    hasAiHelper: false
+    hasAiHelper: false,
+    category: "Forms" as const,
+    effort: "Medium" as const
   },
   {
     id: 3,
@@ -68,7 +74,9 @@ const allIssues = [
     pages: 28,
     roles: ["Designer"],
     description: "Text may be difficult to read for users with visual impairments",
-    hasAiHelper: true
+    hasAiHelper: true,
+    category: "Colour & Contrast" as const,
+    effort: "Easy" as const
   },
   {
     id: 4,
@@ -78,7 +86,9 @@ const allIssues = [
     pages: 15,
     roles: ["Developer", "Designer"],
     description: "Keyboard users cannot see which element has focus",
-    hasAiHelper: false
+    hasAiHelper: false,
+    category: "Navigation" as const,
+    effort: "Medium" as const
   },
   {
     id: 5,
@@ -88,7 +98,9 @@ const allIssues = [
     pages: 23,
     roles: ["Content Author"],
     description: "Screen readers rely on proper heading structure for navigation",
-    hasAiHelper: false
+    hasAiHelper: false,
+    category: "Headings" as const,
+    effort: "Complex" as const
   }
 ];
 
@@ -104,7 +116,8 @@ export default function ReportDetail() {
 
   const filteredIssues = allIssues.filter(issue =>
     issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    issue.rule.toLowerCase().includes(searchTerm.toLowerCase())
+    issue.rule.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    issue.roles.some(role => role.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -213,6 +226,14 @@ export default function ReportDetail() {
                 </CardContent>
               </Card>
 
+              {/* Pro Tip */}
+              <div className="bg-surface-light rounded-lg p-4 border border-border">
+                <p className="text-sm italic text-info-grey flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  Pro tip: Filter by category or effort badges to assign quick wins first.
+                </p>
+              </div>
+
               {/* Issues Requiring Attention */}
               <Card className="shadow-oobee">
                 <CardHeader>
@@ -224,6 +245,8 @@ export default function ReportDetail() {
                       <TableRow>
                         <TableHead>Issue</TableHead>
                         <TableHead>AI Fix</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Effort</TableHead>
                         <TableHead>Severity</TableHead>
                         <TableHead>Pages</TableHead>
                         <TableHead>Who Can Fix</TableHead>
@@ -239,8 +262,8 @@ export default function ReportDetail() {
                               <p className="text-sm text-muted-foreground">{issue.rule}</p>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            {issue.hasAiHelper ? (
+                           <TableCell>
+                             {issue.hasAiHelper ? (
                             <Button 
                               size="sm"
                               variant="pill"
@@ -251,8 +274,16 @@ export default function ReportDetail() {
                               AI Fix
                             </Button>
                             ) : (
-                              <span className="text-muted-foreground text-sm">—</span>
+                              <Badge variant="outline" className="bg-primary-100 text-white border-primary-100">
+                                Needs Human Check
+                              </Badge>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            <CategoryChip category={issue.category} />
+                          </TableCell>
+                          <TableCell>
+                            <EffortBadge effort={issue.effort} />
                           </TableCell>
                           <TableCell>
                             <SeverityBadge severity={issue.severity} />
@@ -309,6 +340,8 @@ export default function ReportDetail() {
                     <TableRow>
                       <TableHead>Issue</TableHead>
                       <TableHead>AI Fix</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Effort</TableHead>
                       <TableHead>Severity</TableHead>
                       <TableHead>Pages</TableHead>
                       <TableHead>Who Can Fix</TableHead>
@@ -324,24 +357,32 @@ export default function ReportDetail() {
                             <p className="text-sm text-muted-foreground">{issue.rule}</p>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          {issue.hasAiHelper ? (
-                            <Button 
-                              size="sm"
-                              variant="pill"
-                              className="bg-primary text-white px-3 py-1 text-xs rounded-full hover:bg-primary-hover"
-                              onClick={() => window.location.href = '/issue-detail'}
-                            >
-                              <Zap className="mr-1 h-3 w-3" />
-                              AI Fix
-                            </Button>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <SeverityBadge severity={issue.severity} />
-                        </TableCell>
+                         <TableCell>
+                           {issue.hasAiHelper ? (
+                             <Button 
+                               size="sm"
+                               variant="pill"
+                               className="bg-primary text-white px-3 py-1 text-xs rounded-full hover:bg-primary-hover"
+                               onClick={() => window.location.href = '/issue-detail'}
+                             >
+                               <Zap className="mr-1 h-3 w-3" />
+                               AI Fix
+                             </Button>
+                           ) : (
+                             <Badge variant="outline" className="bg-primary-100 text-white border-primary-100">
+                               Needs Human Check
+                             </Badge>
+                           )}
+                         </TableCell>
+                         <TableCell>
+                           <CategoryChip category={issue.category} />
+                         </TableCell>
+                         <TableCell>
+                           <EffortBadge effort={issue.effort} />
+                         </TableCell>
+                         <TableCell>
+                           <SeverityBadge severity={issue.severity} />
+                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary">{issue.pages} pages</Badge>
                         </TableCell>

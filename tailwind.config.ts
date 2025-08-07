@@ -29,8 +29,15 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				surface: 'hsl(var(--surface))',
+				'bg-white': 'hsl(var(--bg-white))',
+				'surface-light': 'hsl(var(--surface-light))',
+				'surface-yellow': 'hsl(var(--surface-yellow))',
+				'surface-green': 'hsl(var(--surface-green))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
+					'100': 'hsl(var(--primary-100))',
+					'HL': 'hsl(var(--primary-HL))',
+					'150': 'hsl(var(--primary-150))',
 					hover: 'hsl(var(--primary-hover))',
 					active: 'hsl(var(--primary-active))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -39,10 +46,14 @@ export default {
 				error: 'hsl(var(--error))',
 				warning: 'hsl(var(--warning))',
 				info: 'hsl(var(--info))',
+				'error-red': 'hsl(var(--error-red))',
+				'warn-yellow': 'hsl(var(--warn-yellow))',
+				'info-grey': 'hsl(var(--info-grey))',
+				'pass-green': 'hsl(var(--pass-green))',
 				severity: {
-					'must-fix': 'hsl(var(--error))',
-					'should-fix': 'hsl(var(--warning))',
-					'nice-to-have': 'hsl(var(--info))'
+					'must-fix': 'hsl(var(--error-red))',
+					'should-fix': 'hsl(var(--warn-yellow))',
+					'nice-to-have': 'hsl(var(--info-grey))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',

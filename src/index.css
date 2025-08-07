@@ -7,20 +7,33 @@
 @layer base {
   :root {
     /* A11y Brand Colors */
-    --primary: 275 54% 43%; /* #7032AC - A11y Purple /100 */
-    --primary-hover: 300 100% 45%; /* #E200E5 - A11y Purple /Highlight */
-    --primary-active: 277 48% 32%; /* #552A7B - A11y Purple /150 */
+    --primary-100: 275 54% 43%; /* #7032AC - default buttons & links */
+    --primary-HL: 300 100% 45%; /* #E200E5 - hover */
+    --primary-150: 277 48% 32%; /* #552A7B - pressed / focus ring */
+    --primary: 275 54% 43%; /* alias for primary-100 */
+    --primary-hover: 300 100% 45%; /* alias for primary-HL */
+    --primary-active: 277 48% 32%; /* alias for primary-150 */
     --primary-foreground: 0 0% 100%; /* White text on purple */
 
     /* Accessibility Colors - WCAG 2.1 AA Compliant */
     --focus: 277 48% 32%; /* #552A7B - Focus ring color */
-    --error: 348 100% 39%; /* #C4000E - A11y Red /100 (Must Fix) */
-    --warning: 51 100% 50%; /* #FFC700 - A11y Yellow /100 (Should Fix) */
-    --info: 0 0% 43%; /* #6E6E6E - A11y Grey /70 (Nice to Have) */
+    --error-red: 348 100% 39%; /* #C4000E - Must Fix */
+    --warn-yellow: 51 100% 50%; /* #FFC700 - Should Fix */
+    --info-grey: 0 0% 43%; /* #6E6E6E - Nice to Have */
+    --pass-green: 140 49% 46%; /* #38A169 - Pass state */
+    --error: 348 100% 39%; /* alias for error-red */
+    --warning: 51 100% 50%; /* alias for warn-yellow */
+    --info: 0 0% 43%; /* alias for info-grey */
 
     /* Neutral Colors */
-    --background: 0 0% 100%; /* #FFFFFF - A11y White */
-    --surface: 0 0% 96%; /* #F5F5F5 - A11y Black /05 */
+    --bg-white: 0 0% 100%; /* #FFFFFF */
+    --surface-light: 0 0% 96%; /* #F5F5F5 */
+    --background: 0 0% 100%; /* alias for bg-white */
+    --surface: 0 0% 96%; /* alias for surface-light */
+    
+    /* Special surfaces */
+    --surface-yellow: 60 100% 95%; /* #FFFDE8 - pale yellow for WCAG card */
+    --surface-green: 140 43% 94%; /* #EEF9F0 - compliant state */
     --foreground: 0 0% 13%; /* #212121 */
     --muted-foreground: 0 0% 43%; /* #6E6E6E */
 
