@@ -1,427 +1,298 @@
-import { useState } from "react";
-import { GlobalNav } from "@/components/GlobalNav";
-import { WCAGComplianceCard } from "@/components/WCAGComplianceCard";
-import { SeverityBadge } from "@/components/SeverityBadge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertTriangle, Search, Link2, Download, FileText, FileSpreadsheet, ExternalLink, Zap, ChevronRight, Info } from "lucide-react";
-import { Link } from "react-router-dom";
-import { CategoryChip } from "@/components/CategoryChip";
-import { EffortBadge } from "@/components/EffortBadge";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Search, ExternalLink, Zap, ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { CategoryChip } from '@/components/CategoryChip';
+import { EffortBadge } from '@/components/EffortBadge';
+import { WCAGComplianceCard } from '@/components/WCAGComplianceCard';
+import { SeverityBadge } from '@/components/SeverityBadge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-const topIssues = [
-  {
-    id: 1,
-    title: "Images missing alternative text",
-    description: "Screen readers cannot describe images to visually impaired users",
-    severity: "must-fix" as const,
-    impact: "Affects 89% of your pages",
-    pages: 42
-  },
-  {
-    id: 2,
-    title: "Form controls missing labels",
-    description: "Form fields cannot be identified by assistive technologies",
-    severity: "must-fix" as const,
-    impact: "Affects 67% of your forms",
-    pages: 18
-  },
-  {
-    id: 3,
-    title: "Insufficient color contrast",
-    description: "Text may be difficult to read for users with visual impairments",
-    severity: "should-fix" as const,
-    impact: "Affects 45% of your content",
-    pages: 28
-  }
-];
+interface IssueData {
+  id: string;
+  title: string;
+  ruleId: string;
+  hasAI: boolean;
+  category: 'Images' | 'Colour & Contrast' | 'Headings' | 'Forms' | 'Navigation' | 'Advanced';
+  effort: 'Easy' | 'Medium' | 'Complex';
+  severity: 'must-fix' | 'should-fix' | 'nice-to-have';
+  pages: number;
+  roles: string[];
+}
 
-const allIssues = [
-  {
-    id: 1,
-    rule: "Image Alternative Text",
-    title: "Images missing alternative text",
-    severity: "must-fix" as const,
-    pages: 42,
-    roles: ["Content Author", "Developer"],
-    description: "Screen readers cannot describe images to visually impaired users",
-    hasAiHelper: true,
-    category: "Images" as const,
-    effort: "Easy" as const
-  },
-  {
-    id: 2,
-    rule: "Form Label",
-    title: "Form controls missing labels",
-    severity: "must-fix" as const,
-    pages: 18,
-    roles: ["Developer"],
-    description: "Form fields cannot be identified by assistive technologies",
-    hasAiHelper: false,
-    category: "Forms" as const,
-    effort: "Medium" as const
-  },
-  {
-    id: 3,
-    rule: "Color Contrast",
-    title: "Insufficient color contrast",
-    severity: "should-fix" as const,
-    pages: 28,
-    roles: ["Designer"],
-    description: "Text may be difficult to read for users with visual impairments",
-    hasAiHelper: true,
-    category: "Colour & Contrast" as const,
-    effort: "Easy" as const
-  },
-  {
-    id: 4,
-    rule: "Focus Visible",
-    title: "Missing focus indicators",
-    severity: "should-fix" as const,
-    pages: 15,
-    roles: ["Developer", "Designer"],
-    description: "Keyboard users cannot see which element has focus",
-    hasAiHelper: false,
-    category: "Navigation" as const,
-    effort: "Medium" as const
-  },
-  {
-    id: 5,
-    rule: "Heading Structure",
-    title: "Improper heading hierarchy",
-    severity: "nice-to-have" as const,
-    pages: 23,
-    roles: ["Content Author"],
-    description: "Screen readers rely on proper heading structure for navigation",
-    hasAiHelper: false,
-    category: "Headings" as const,
-    effort: "Complex" as const
-  }
-];
+const ReportDetail: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-const roleChipColors = {
-  "Developer": "bg-[#D0E4FF] text-blue-800 border-blue-300",
-  "Designer": "bg-[#F4E0FF] text-purple-800 border-purple-300", 
-  "Content Author": "bg-[#CFF9E6] text-green-800 border-green-300"
-};
+  const wcagData = {
+    checksPassed: 17,
+    totalChecks: 20,
+    status: 'needs-improvement' as const
+  };
 
-export default function ReportDetail() {
-  const [activeTab, setActiveTab] = useState("highlights");
-  const [searchTerm, setSearchTerm] = useState("");
+  const topIssues = [
+    {
+      title: "Images missing alternative text",
+      impact: "87% of accessibility barriers removed",
+      description: "24 images across 12 pages need descriptive alt text to help screen reader users understand visual content."
+    },
+    {
+      title: "Low color contrast on buttons",
+      impact: "43% of accessibility barriers removed", 
+      description: "Primary action buttons don't meet 4.5:1 contrast ratio, making them hard to read for users with visual impairments."
+    },
+    {
+      title: "Form inputs missing labels",
+      impact: "31% of accessibility barriers removed",
+      description: "8 form fields lack proper labels, creating confusion for screen reader users when filling out forms."
+    }
+  ];
 
-  const filteredIssues = allIssues.filter(issue =>
+  const issues: IssueData[] = [
+    {
+      id: 'IMG-001',
+      title: 'Images missing alternative text',
+      ruleId: 'image-alt',
+      hasAI: true,
+      category: 'Images',
+      effort: 'Easy',
+      severity: 'must-fix',
+      pages: 12,
+      roles: ['Developer', 'Content Author']
+    },
+    {
+      id: 'CON-002', 
+      title: 'Low color contrast on buttons',
+      ruleId: 'color-contrast',
+      hasAI: false,
+      category: 'Colour & Contrast',
+      effort: 'Medium',
+      severity: 'must-fix',
+      pages: 8,
+      roles: ['Designer', 'Developer']
+    },
+    {
+      id: 'FORM-003',
+      title: 'Form inputs missing labels',
+      ruleId: 'label',
+      hasAI: true,
+      category: 'Forms',
+      effort: 'Easy',
+      severity: 'should-fix',
+      pages: 5,
+      roles: ['Developer']
+    },
+    {
+      id: 'NAV-004',
+      title: 'Navigation links unclear',
+      ruleId: 'link-purpose',
+      hasAI: false,
+      category: 'Navigation',
+      effort: 'Complex',
+      severity: 'should-fix',
+      pages: 3,
+      roles: ['Content Author', 'Designer']
+    },
+    {
+      id: 'HEAD-005',
+      title: 'Heading structure non-sequential',
+      ruleId: 'heading-order',
+      hasAI: false,
+      category: 'Headings',
+      effort: 'Medium',
+      severity: 'nice-to-have',
+      pages: 15,
+      roles: ['Developer']
+    }
+  ];
+
+  const filteredIssues = issues.filter(issue => 
     issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    issue.rule.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    issue.roles.some(role => role.toLowerCase().includes(searchTerm.toLowerCase()))
+    issue.ruleId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    issue.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    issue.effort.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const scrollToFirstMissing = () => {
+    // In a real implementation, this would scroll to the first failing issue
+    const firstIssue = document.querySelector('[data-issue-row]');
+    if (firstIssue) {
+      firstIssue.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <GlobalNav />
-      
-      <main className="container mx-auto px-20 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-5xl font-heading font-normal text-foreground mb-2">
-                Accessibility Report
-              </h1>
-              <p className="text-lg text-muted-foreground">
-                ministry.gov.sg • Scanned January 15, 2024
+    <div className="max-w-7xl mx-auto p-6 space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-[56px] leading-[64px] font-heading text-foreground">Report Overview</h1>
+          <p className="text-lg text-muted-foreground mt-2">
+            Accessibility scan results for portal.gov.sg
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost">Copy Link</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                Export <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>PDF (Light ≤ 3 MB)</DropdownMenuItem>
+              <DropdownMenuItem>CSV</DropdownMenuItem>
+              <DropdownMenuItem>Jira Tickets (BETA)</DropdownMenuItem>
+              <DropdownMenuItem>Copy Markdown</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* WCAG Compliance Card */}
+      <WCAGComplianceCard 
+        variant="needs-improvement"
+        score={Math.round((wcagData.checksPassed / wcagData.totalChecks) * 100)}
+      />
+
+      {/* Top 3 Issues */}
+      <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+              <span className="text-primary font-bold">△</span>
+            </div>
+            Top 3 Issues
+          </CardTitle>
+          <p className="text-muted-foreground text-sm">
+            Fixing these issues first will improve accessibility for most visitors with the least effort.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {topIssues.map((issue, index) => (
+            <div key={index} className="bg-white p-4 rounded-lg border">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-semibold text-foreground">{issue.title}</h3>
+                <Badge className="bg-pass-green text-white text-xs">{issue.impact}</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {issue.description}
               </p>
             </div>
-            
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Pro Tip */}
+      <div className="text-center">
+        <p className="text-sm italic text-info-grey">
+          ℹ Pro tip: Filter by category or effort badges to assign quick wins first.
+        </p>
+      </div>
+
+      {/* Issues Requiring Attention */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Issues Requiring Attention</CardTitle>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" className="text-foreground">
-                <Link2 className="mr-2 h-4 w-4" />
-                Copy Link
-              </Button>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="bg-primary hover:bg-primary-hover text-primary-foreground">
-                    <Download className="mr-2 h-4 w-4" />
-                    Export
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <FileText className="mr-2 h-4 w-4" />
-                    PDF (Light ≤ 3 MB)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <FileSpreadsheet className="mr-2 h-4 w-4" />
-                    CSV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Jira Tickets (BETA)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Copy Markdown
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search issues, rules, or categories..."
+                  className="pl-9 w-80"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
           </div>
-
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-muted">
-              <TabsTrigger value="highlights">Highlights</TabsTrigger>
-              <TabsTrigger value="all-details">All Details</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="highlights" className="mt-8 space-y-8">
-              {/* WCAG Compliance Card */}
-              <WCAGComplianceCard 
-                score={85}
-                variant="needs-improvement"
-              />
-
-              {/* Top 3 Issues Card */}
-              <Card className="shadow-oobee bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
-                <CardHeader className="pb-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-purple-200 rounded-lg flex items-center justify-center">
-                      <AlertTriangle className="h-6 w-6 text-purple-700" />
-                    </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Issue</TableHead>
+                <TableHead className="w-16">AI</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Effort</TableHead>
+                <TableHead>Severity</TableHead>
+                <TableHead className="text-center">Pages</TableHead>
+                <TableHead>Role Chips</TableHead>
+                <TableHead className="text-right">View Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredIssues.map((issue) => (
+                <TableRow key={issue.id} data-issue-row className="hover:bg-surface/50">
+                  <TableCell>
                     <div>
-                      <CardTitle className="text-2xl font-heading text-purple-900 mb-2">
-                        Top 3 Issues
-                      </CardTitle>
-                      <p className="text-purple-700 text-base">
-                        Fixing these issues first will improve accessibility for most visitors with the least effort.
-                      </p>
+                      <div className="font-medium text-foreground">{issue.title}</div>
+                      <div className="text-sm text-muted-foreground">{issue.ruleId}</div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {topIssues.map((issue) => (
-                    <Link to="/issue-detail" key={issue.id}>
-                      <Card className="hover:shadow-md transition-shadow cursor-pointer bg-white">
-                        <CardContent className="p-6">
-                          <div className="flex items-start justify-between mb-3">
-                            <h3 className="text-lg font-semibold text-foreground">
-                              {issue.title}
-                            </h3>
-                            <SeverityBadge severity={issue.severity} />
-                          </div>
-                          <p className="text-muted-foreground mb-2">
-                            {issue.description}
-                          </p>
-                          <p className="text-sm font-medium text-primary">
-                            {issue.impact} • {issue.pages} pages affected
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Pro Tip */}
-              <div className="bg-surface-light rounded-lg p-4 border border-border">
-                <p className="text-sm italic text-info-grey flex items-center gap-2">
-                  <Info className="h-4 w-4" />
-                  Pro tip: Filter by category or effort badges to assign quick wins first.
-                </p>
-              </div>
-
-              {/* Issues Requiring Attention */}
-              <Card className="shadow-oobee">
-                <CardHeader>
-                  <CardTitle className="text-2xl font-heading">Issues Requiring Attention</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Issue</TableHead>
-                        <TableHead>AI Fix</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Effort</TableHead>
-                        <TableHead>Severity</TableHead>
-                        <TableHead>Pages</TableHead>
-                        <TableHead>Who Can Fix</TableHead>
-                        <TableHead></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {allIssues.map((issue) => (
-                        <TableRow key={issue.id} className="hover:bg-surface">
-                          <TableCell>
-                            <div>
-                              <p className="font-medium text-foreground">{issue.title}</p>
-                              <p className="text-sm text-muted-foreground">{issue.rule}</p>
-                            </div>
-                          </TableCell>
-                           <TableCell>
-                             {issue.hasAiHelper ? (
-                            <Button 
-                              size="sm"
-                              variant="pill"
-                              className="bg-primary text-white px-3 py-1 text-xs rounded-full hover:bg-primary-hover"
-                              onClick={() => window.location.href = '/issue-detail'}
-                            >
-                              <Zap className="mr-1 h-3 w-3" />
-                              AI Fix
-                            </Button>
-                            ) : (
-                              <Badge variant="outline" className="bg-primary-100 text-white border-primary-100">
-                                Needs Human Check
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <CategoryChip category={issue.category} />
-                          </TableCell>
-                          <TableCell>
-                            <EffortBadge effort={issue.effort} />
-                          </TableCell>
-                          <TableCell>
-                            <SeverityBadge severity={issue.severity} />
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">{issue.pages} pages</Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              {issue.roles.map((role) => (
-                                <span
-                                  key={role}
-                                  className={`px-2 py-1 text-xs font-medium rounded-md border ${roleChipColors[role as keyof typeof roleChipColors]}`}
-                                >
-                                  {role}
-                                </span>
-                              ))}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Link to="/issue-detail">
-                              <Button variant="ghost" size="sm">
-                                View Details
-                                <ChevronRight className="ml-1 h-3 w-3" />
-                              </Button>
-                            </Link>
-                          </TableCell>
-                        </TableRow>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {issue.hasAI ? (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        asChild
+                      >
+                        <Link to="/ai-helper">
+                          <Zap className="h-4 w-4 text-primary" />
+                        </Link>
+                      </Button>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <CategoryChip category={issue.category} />
+                  </TableCell>
+                  <TableCell>
+                    <EffortBadge effort={issue.effort} />
+                  </TableCell>
+                  <TableCell>
+                    <SeverityBadge severity={issue.severity} />
+                  </TableCell>
+                  <TableCell className="text-center text-muted-foreground">
+                    {issue.pages}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {issue.roles.map((role) => (
+                        <Badge key={role} variant="outline" className="text-xs">
+                          {role}
+                        </Badge>
                       ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to="/issue-detail">
+                        <ExternalLink className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-            <TabsContent value="all-details" className="mt-8">
-              {/* Search */}
-              <div className="mb-6">
-                <div className="relative max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by rule ID or role..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              {/* Issues Table */}
-              <Card className="shadow-oobee">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Issue</TableHead>
-                      <TableHead>AI Fix</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Effort</TableHead>
-                      <TableHead>Severity</TableHead>
-                      <TableHead>Pages</TableHead>
-                      <TableHead>Who Can Fix</TableHead>
-                      <TableHead></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredIssues.map((issue) => (
-                      <TableRow key={issue.id} className="hover:bg-surface">
-                        <TableCell>
-                          <div>
-                            <p className="font-medium text-foreground">{issue.title}</p>
-                            <p className="text-sm text-muted-foreground">{issue.rule}</p>
-                          </div>
-                        </TableCell>
-                         <TableCell>
-                           {issue.hasAiHelper ? (
-                             <Button 
-                               size="sm"
-                               variant="pill"
-                               className="bg-primary text-white px-3 py-1 text-xs rounded-full hover:bg-primary-hover"
-                               onClick={() => window.location.href = '/issue-detail'}
-                             >
-                               <Zap className="mr-1 h-3 w-3" />
-                               AI Fix
-                             </Button>
-                           ) : (
-                             <Badge variant="outline" className="bg-primary-100 text-white border-primary-100">
-                               Needs Human Check
-                             </Badge>
-                           )}
-                         </TableCell>
-                         <TableCell>
-                           <CategoryChip category={issue.category} />
-                         </TableCell>
-                         <TableCell>
-                           <EffortBadge effort={issue.effort} />
-                         </TableCell>
-                         <TableCell>
-                           <SeverityBadge severity={issue.severity} />
-                         </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{issue.pages} pages</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {issue.roles.map((role) => (
-                              <span
-                                key={role}
-                                className={`px-2 py-1 text-xs font-medium rounded-md border ${roleChipColors[role as keyof typeof roleChipColors]}`}
-                              >
-                                {role}
-                              </span>
-                            ))}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Link to="/issue-detail">
-                            <Button variant="ghost" size="sm">
-                              View Details
-                              <ChevronRight className="ml-1 h-3 w-3" />
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
-
-              {/* Re-scan CTA */}
-              <div className="mt-8 text-center">
-                <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                  Re-scan selected pages
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
+      {/* Re-scan Button */}
+      <div className="flex justify-center">
+        <Button variant="outline" size="lg">
+          Re-scan selected pages
+        </Button>
+      </div>
     </div>
   );
-}
+};
+
+export default ReportDetail;

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Copy, ExternalLink, Lightbulb, AlertTriangle, Users, Clock } from 'lucide-react';
+import { ArrowLeft, Copy, ExternalLink, Lightbulb, AlertTriangle, Users, Clock, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AIHelperCard } from '@/components/AIHelperCard';
 import { ShareBrief } from '@/components/ShareBrief';
@@ -12,11 +12,11 @@ import { CodeTabBar } from '@/components/CodeTabBar';
 
 const IssueDetailNew: React.FC = () => {
   const [showShareBrief, setShowShareBrief] = useState(false);
-  const [showAIHelper, setShowAIHelper] = useState(false);
+  const [showHelperModal, setShowHelperModal] = useState(false);
 
-  const handleAIHelperAccepted = () => {
+  const handleHelperModalAccepted = () => {
     setShowShareBrief(true);
-    setShowAIHelper(false);
+    setShowHelperModal(false);
   };
 
   const issueData = {
@@ -138,8 +138,8 @@ const IssueDetailNew: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <CodeTabBar 
-                  htmlCode={codeExamples.html}
-                  cssCode={codeExamples.css}
+                  htmlContent={codeExamples.html}
+                  cssContent={codeExamples.css}
                 />
               </CardContent>
             </Card>
@@ -169,8 +169,9 @@ const IssueDetailNew: React.FC = () => {
           <div className="space-y-6">
             {/* AI Helper Card */}
             <AIHelperCard 
-              isVisible={true}
-              onOpenHelper={() => setShowAIHelper(true)}
+              hasHelper={true}
+              issueType="Alt Text"
+              onOpenHelper={() => setShowHelperModal(true)}
             />
 
             {/* Step-by-Step Guide */}
@@ -227,7 +228,10 @@ const IssueDetailNew: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle>
-                  <GlossaryHover term="WCAG">WCAG</GlossaryHover> Reference
+                  <GlossaryHover 
+                    term="WCAG"
+                    definition="Web Content Accessibility Guidelines - International standards for making web content accessible to people with disabilities"
+                  /> Reference
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -286,8 +290,8 @@ const IssueDetailNew: React.FC = () => {
             {/* Share Brief - Hidden by default, visible after AI Helper Apply */}
             {showShareBrief && (
               <ShareBrief 
-                title="Images missing alt text"
-                description="AI recommends descriptive alt text for 24 images across 12 pages. Copy & share this snippet with your team."
+                isVisible={showShareBrief}
+                briefText="AI recommends descriptive alt text for 24 images across 12 pages. Copy & share this snippet with your team."
               />
             )}
           </div>
@@ -295,7 +299,7 @@ const IssueDetailNew: React.FC = () => {
       </div>
 
       {/* AI Helper Modal */}
-      {showAIHelper && (
+      {showHelperModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b">
@@ -340,14 +344,14 @@ const IssueDetailNew: React.FC = () => {
               <div className="flex space-x-3">
                 <Button 
                   variant="ghost" 
-                  onClick={() => setShowAIHelper(false)}
+                  onClick={() => setShowHelperModal(false)}
                 >
                   Cancel
                 </Button>
                 <Button variant="outline">
                   Regenerate
                 </Button>
-                <Button onClick={handleAIHelperAccepted}>
+                <Button onClick={handleHelperModalAccepted}>
                   Apply Suggestions
                 </Button>
               </div>

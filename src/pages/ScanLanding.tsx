@@ -52,7 +52,7 @@ export default function ScanLanding() {
                 placeholder="https://"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={(e) => e.key === 'Enter' && handleStartScan()}
                 className="flex-1 focus:ring-2 focus:ring-focus focus:ring-offset-2"
               />
               <div className="flex items-center gap-2">
