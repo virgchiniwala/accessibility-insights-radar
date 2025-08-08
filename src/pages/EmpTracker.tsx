@@ -133,119 +133,123 @@ const EmpTracker: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">EMP Tracker</h1>
-            <p className="text-gray-600 mt-1">Multi-site accessibility monitoring dashboard</p>
-          </div>
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">EMP Tracker</h1>
+          <p className="text-gray-600 mt-1">Multi-site accessibility monitoring dashboard</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" asChild>
+            <Link to="/reports">View Reports</Link>
+          </Button>
           <Button asChild>
-            <Link to="/scan-landing">
+            <Link to="/scan">
               <Calendar className="w-4 h-4 mr-2" />
               Schedule New Scan
             </Link>
           </Button>
         </div>
+      </div>
 
-        {/* Multi-Site Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Multi-Site Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {sites.map((site) => (
-                <div
-                  key={site.id}
-                  className="flex items-center justify-between p-4 bg-white rounded-lg border hover:shadow-md transition-shadow"
-                >
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{site.name}</h3>
-                    <p className="text-sm text-gray-500">{site.url}</p>
-                    <div className="flex items-center mt-2 space-x-2">
-                      <SparkLine data={site.trend} siteId={site.id} />
-                      <div className="flex items-center">
-                        {site.trend[site.trend.length - 1] > site.trend[site.trend.length - 2] ? (
-                          <TrendingUp className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4 text-red-500" />
-                        )}
-                      </div>
+      {/* Multi-Site Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Multi-Site Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {sites.map((site) => (
+              <div
+                key={site.id}
+                className="flex items-center justify-between p-4 bg-white rounded-lg border hover:shadow-md transition-shadow"
+              >
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">{site.name}</h3>
+                  <p className="text-sm text-gray-500">{site.url}</p>
+                  <div className="flex items-center mt-2 space-x-2">
+                    <SparkLine data={site.trend} siteId={site.id} />
+                    <div className="flex items-center">
+                      {site.trend[site.trend.length - 1] > site.trend[site.trend.length - 2] ? (
+                        <TrendingUp className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4 text-red-500" />
+                      )}
                     </div>
                   </div>
-                  <div className="text-right">
+                </div>
+                <div className="text-right">
+                  <Badge 
+                    variant={site.compliance >= 90 ? "default" : site.compliance >= 80 ? "secondary" : "destructive"}
+                    className="text-lg px-3 py-1"
+                  >
+                    {site.compliance}%
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Engagement Panel */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Engagement Panel</CardTitle>
+          <p className="text-sm text-gray-600">Schedule scans and track site activity</p>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Site</TableHead>
+                <TableHead>URL</TableHead>
+                <TableHead>Last Scan</TableHead>
+                <TableHead>Compliance</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sites.map((site) => (
+                <TableRow key={site.id}>
+                  <TableCell className="font-medium">{site.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-600">{site.url}</span>
+                      <ExternalLink className="w-3 h-3 text-gray-400" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm text-gray-600">
+                      Last scan {site.daysAgo} days ago
+                    </span>
+                  </TableCell>
+                  <TableCell>
                     <Badge 
                       variant={site.compliance >= 90 ? "default" : site.compliance >= 80 ? "secondary" : "destructive"}
-                      className="text-lg px-3 py-1"
                     >
                       {site.compliance}%
                     </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Engagement Panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Engagement Panel</CardTitle>
-            <p className="text-sm text-gray-600">Schedule scans and track site activity</p>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Site</TableHead>
-                  <TableHead>URL</TableHead>
-                  <TableHead>Last Scan</TableHead>
-                  <TableHead>Compliance</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      asChild
+                      className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    >
+                      <Link to={`/scan?url=${encodeURIComponent(`https://${site.url}`)}`}>
+                        Schedule Scan
+                      </Link>
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sites.map((site) => (
-                  <TableRow key={site.id}>
-                    <TableCell className="font-medium">{site.name}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">{site.url}</span>
-                        <ExternalLink className="w-3 h-3 text-gray-400" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-600">
-                        {site.daysAgo} days ago
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={site.compliance >= 90 ? "default" : site.compliance >= 80 ? "secondary" : "destructive"}
-                      >
-                        {site.compliance}%
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        asChild
-                      >
-                        <Link to={`/scan-landing?url=${encodeURIComponent(site.url)}`}>
-                          Schedule Scan
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </div>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
