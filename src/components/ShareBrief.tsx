@@ -46,6 +46,7 @@ export function ShareBrief({ isVisible, briefText }: ShareBriefProps) {
             size="icon"
             onClick={handleCopy}
             className="h-6 w-6"
+            title="Copy fix summary"
           >
             {copied ? (
               <Check className="h-4 w-4 text-green-600" />

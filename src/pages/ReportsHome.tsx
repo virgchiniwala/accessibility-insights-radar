@@ -113,11 +113,11 @@ export default function ReportsHome() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Link to="/report-details">
-                        <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to="/report-details">
                           View Latest Report →
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

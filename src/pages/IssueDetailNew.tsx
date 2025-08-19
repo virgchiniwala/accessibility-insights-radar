@@ -3,40 +3,81 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Copy, ExternalLink, Lightbulb, AlertTriangle, Users, Clock, Zap } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, Copy, Check, ExternalLink, Lightbulb, AlertTriangle, Users, Clock, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ShareBrief } from '@/components/ShareBrief';
 import { GlossaryHover } from '@/components/GlossaryHover';
+import { CodeTabBar } from '@/components/CodeTabBar';
 import { useToast } from '@/hooks/use-toast';
 
 const IssueDetailNew: React.FC = () => {
   const [showShareBrief, setShowShareBrief] = useState(false);
-  const [activeMainTab, setActiveMainTab] = useState<"guided" | "manual">("guided");
-  const [activeContextTab, setActiveContextTab] = useState<"html" | "css">("html");
-  const [fixedCode, setFixedCode] = useState("");
-  const [aiSuggestions, setAiSuggestions] = useState({
-    altText1: "Students collaborating in modern library space",
-    altText2: "Wireless headphones in matte black finish"
+  const [activeMainTab, setActiveMainTab] = useState<"content" | "dev">("content");
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [hasGenerated, setHasGenerated] = useState(false);
+  const [devCode, setDevCode] = useState({
+    current: `<img src="/hero-banner.jpg" alt="">
+<img src="/product-1.jpg" class="product-image" alt="">`,
+    fixed: ""
   });
   const { toast } = useToast();
 
-  const handleApplySuggestions = () => {
-    // Copy AI suggestions to manual tab
-    const fixedHtml = `<img src="/hero-banner.jpg" alt="${aiSuggestions.altText1}" />
-<img src="/product-1.jpg" alt="${aiSuggestions.altText2}" class="product-image" />`;
-    setFixedCode(fixedHtml);
+  const mockItems = [
+    { id: 1, filename: "hero-banner.jpg", status: "missing", currentText: "", suggestedText: "" },
+    { id: 2, filename: "product-1.jpg", status: "missing", currentText: "", suggestedText: "" },
+    { id: 3, filename: "team-photo.jpg", status: "vague", currentText: "Team", suggestedText: "" }
+  ];
+
+  const handleGenerate = () => {
+    // Simulate AI generation
+    const newSuggestions = selectedItems.map(id => {
+      const item = mockItems.find(i => i.id === id);
+      return {
+        ...item,
+        suggestedText: id === 1 ? "Students collaborating in modern library space" : 
+                      id === 2 ? "Wireless headphones in matte black finish" :
+                      "Five diverse professionals in business attire"
+      };
+    });
+    setSuggestions(newSuggestions);
+    setHasGenerated(true);
+  };
+
+  const handleAcceptAndCopy = () => {
+    // Copy suggestions to clipboard
+    const textToCopy = suggestions.map(s => `${s.filename}: ${s.suggestedText}`).join('\n');
+    navigator.clipboard.writeText(textToCopy);
+    
+    // Update Dev tab with fixed code
+    const fixedHtml = `<img src="/hero-banner.jpg" alt="${suggestions[0]?.suggestedText || 'Students collaborating in modern library space'}">
+<img src="/product-1.jpg" alt="${suggestions[1]?.suggestedText || 'Wireless headphones in matte black finish'}" class="product-image">`;
+    
+    setDevCode(prev => ({ ...prev, fixed: fixedHtml }));
     setShowShareBrief(true);
+    
     toast({
-      title: "Suggestions applied",
-      description: "AI suggestions copied to Manual tab. Share with your team!"
+      title: "Copied and inserted into Dev (AI) → Fixed",
+      description: "Suggestions applied successfully."
     });
   };
 
-  const handleCodeCopy = async (code: string) => {
-    await navigator.clipboard.writeText(code);
+  const handleDevGenerate = () => {
+    // Generate developer code patches
+    const fixedCode = `<img src="/hero-banner.jpg" alt="Students collaborating in modern library space">
+<img src="/product-1.jpg" alt="Wireless headphones in matte black finish" class="product-image">`;
+    
+    setDevCode(prev => ({ ...prev, fixed: fixedCode }));
+    setHasGenerated(true);
+  };
+
+  const handleDevAcceptAndCopy = () => {
+    navigator.clipboard.writeText(devCode.fixed);
+    setShowShareBrief(true);
     toast({
-      title: "Copied to clipboard",
-      description: "Code has been copied successfully."
+      title: "Code copied to clipboard",
+      description: "Dev changes generated and ready to share."
     });
   };
 
@@ -55,34 +96,18 @@ const IssueDetailNew: React.FC = () => {
 
   const codeExamples = {
     html: `<!-- Current (Problematic) -->
-<img src="/hero-banner.jpg" />
-<img src="/product-1.jpg" class="product-image" />
+<img src="/hero-banner.jpg" alt="">
+<img src="/product-1.jpg" class="product-image" alt="">
 
 <!-- Fixed -->
-<img src="/hero-banner.jpg" alt="Students collaborating in modern library space" />
-<img src="/product-1.jpg" alt="Wireless headphones in matte black finish" class="product-image" />`,
+<img src="/hero-banner.jpg" alt="Students collaborating in modern library space">
+<img src="/product-1.jpg" alt="Wireless headphones in matte black finish" class="product-image">`,
     css: `/* CSS Path for targeting images */
 .hero-section img,
 .product-grid .product-image,
 .content-area img:not([alt]) {
   /* These selectors help identify problematic images */
   border: 2px solid #ff6b6b; /* Debug outline */
-}
-
-/* Accessible image containers */
-.image-container {
-  position: relative;
-}
-
-.image-container::after {
-  content: "Missing alt text";
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: rgba(255, 107, 107, 0.9);
-  color: white;
-  padding: 4px 8px;
-  font-size: 12px;
 }`
   };
 
@@ -158,35 +183,37 @@ const IssueDetailNew: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex space-x-1">
                     <Button
-                      variant={activeMainTab === "guided" ? "default" : "ghost"}
+                      variant={activeMainTab === "content" ? "default" : "ghost"}
                       size="sm"
-                      onClick={() => setActiveMainTab("guided")}
+                      onClick={() => setActiveMainTab("content")}
                       className="h-8"
+                      role="tab"
+                      aria-selected={activeMainTab === "content"}
                     >
-                      Guided (AI)
+                      Content (AI)
                     </Button>
                     <Button
-                      variant={activeMainTab === "manual" ? "default" : "ghost"}
+                      variant={activeMainTab === "dev" ? "default" : "ghost"}
                       size="sm"
-                      onClick={() => setActiveMainTab("manual")}
+                      onClick={() => setActiveMainTab("dev")}
                       className="h-8"
+                      role="tab"
+                      aria-selected={activeMainTab === "dev"}
                     >
-                      Manual
+                      Dev (AI)
                     </Button>
                   </div>
                   <div className="flex space-x-1">
                     <Button
-                      variant={activeContextTab === "html" ? "outline" : "ghost"}
+                      variant="outline"
                       size="sm"
-                      onClick={() => setActiveContextTab("html")}
                       className="h-7 text-xs"
                     >
                       HTML Element
                     </Button>
                     <Button
-                      variant={activeContextTab === "css" ? "outline" : "ghost"}
+                      variant="ghost"
                       size="sm"
-                      onClick={() => setActiveContextTab("css")}
                       className="h-7 text-xs"
                     >
                       CSS Path
@@ -195,101 +222,163 @@ const IssueDetailNew: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                {activeMainTab === "manual" ? (
+                {activeMainTab === "content" ? (
                   <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-medium text-gray-700">Current (Incorrect)</h4>
-                        <Button variant="ghost" size="sm" onClick={() => handleCodeCopy(activeContextTab === "html" ? codeExamples.html.split("<!-- Fixed -->")[0] : codeExamples.css)}>
-                          <Copy className="w-3 h-3" />
+                    {/* Header Row */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        {selectedItems.length} selected
+                      </span>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={handleGenerate}
+                          disabled={selectedItems.length === 0}
+                          size="sm"
+                        >
+                          Generate
                         </Button>
-                      </div>
-                      <div className="border border-red-200 rounded-lg bg-red-50 p-4">
-                        <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto">
-                          {activeContextTab === "html" 
-                            ? codeExamples.html.split("<!-- Fixed -->")[0].replace("<!-- Current (Problematic) -->", "").trim()
-                            : codeExamples.css
-                          }
-                        </pre>
+                        {hasGenerated && (
+                          <Button variant="outline" size="sm">
+                            Regenerate
+                          </Button>
+                        )}
                       </div>
                     </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-medium text-gray-700">Fixed (Correct)</h4>
-                        <Button variant="ghost" size="sm" onClick={() => handleCodeCopy(fixedCode)}>
-                          <Copy className="w-3 h-3" />
-                        </Button>
-                      </div>
-                      <div className="border border-green-200 rounded-lg bg-green-50 p-4">
-                        <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto">
-                          {fixedCode || (activeContextTab === "html" 
-                            ? codeExamples.html.split("<!-- Fixed -->")[1].trim()
-                            : "/* Fixed CSS will appear here after applying AI suggestions */"
-                          )}
-                        </pre>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    {/* AI Helper Editor */}
-                    {issueData.category === "Images" ? (
-                      <div className="space-y-4">
-                        <div className="p-4 bg-purple-50 rounded-lg">
-                          <h3 className="font-medium text-gray-900 mb-3">AI Suggested Alt Text</h3>
-                          <div className="space-y-3">
-                            <div className="p-3 bg-white rounded border">
-                              <div className="flex items-center space-x-3 mb-2">
-                                <img src="/api/placeholder/40/40" alt="" className="w-10 h-10 rounded border" />
-                                <div className="flex-1">
-                                  <div className="text-sm font-medium">hero-banner.jpg</div>
-                                  <div className="text-xs text-gray-500">Current: (missing)</div>
-                                </div>
-                              </div>
-                              <textarea
-                                className="w-full p-2 border rounded text-sm"
-                                rows={2}
-                                value={aiSuggestions.altText1}
-                                onChange={(e) => setAiSuggestions({...aiSuggestions, altText1: e.target.value})}
-                                placeholder="AI suggested alt text..."
-                              />
-                            </div>
-                            <div className="p-3 bg-white rounded border">
-                              <div className="flex items-center space-x-3 mb-2">
-                                <img src="/api/placeholder/40/40" alt="" className="w-10 h-10 rounded border" />
-                                <div className="flex-1">
-                                  <div className="text-sm font-medium">product-1.jpg</div>
-                                  <div className="text-xs text-gray-500">Current: (missing)</div>
-                                </div>
-                              </div>
-                              <textarea
-                                className="w-full p-2 border rounded text-sm"
-                                rows={2}
-                                value={aiSuggestions.altText2}
-                                onChange={(e) => setAiSuggestions({...aiSuggestions, altText2: e.target.value})}
-                                placeholder="AI suggested alt text..."
-                              />
-                            </div>
-                          </div>
-                          <div className="flex space-x-2 mt-4">
-                            <Button variant="outline" size="sm">
-                              Regenerate
-                            </Button>
-                            <Button size="sm" onClick={handleApplySuggestions}>
-                              Apply Suggestions
-                            </Button>
+
+                    {/* Item List */}
+                    <div className="space-y-2">
+                      {mockItems.map((item) => (
+                        <div key={item.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(item.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedItems([...selectedItems, item.id]);
+                              } else {
+                                setSelectedItems(selectedItems.filter(id => id !== item.id));
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <div className="w-10 h-10 bg-gray-200 rounded border"></div>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium">{item.filename}</div>
+                            <Badge variant="outline" className="text-xs mt-1">
+                              {item.status}
+                            </Badge>
                           </div>
                         </div>
+                      ))}
+                    </div>
+
+                    {/* Editor */}
+                    {suggestions.length > 0 && (
+                      <div className="space-y-4">
+                        {suggestions.map((suggestion, index) => (
+                          <div key={index} className="space-y-2">
+                            <Label>Suggested text for {suggestion.filename}</Label>
+                            <Textarea
+                              value={suggestion.suggestedText}
+                              onChange={(e) => {
+                                const newSuggestions = [...suggestions];
+                                newSuggestions[index].suggestedText = e.target.value;
+                                setSuggestions(newSuggestions);
+                              }}
+                              className="font-body text-base leading-6"
+                              rows={2}
+                            />
+                            <div className="text-xs text-muted-foreground">
+                              {suggestion.suggestedText.length < 15 ? "Too short (<15 chars)" :
+                               suggestion.suggestedText.length > 125 ? "Too long (>125 chars)" :
+                               "Good length"}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">Shorten</Button>
+                          <Button variant="outline" size="sm">More specific</Button>
+                          <Button variant="outline" size="sm">Include context</Button>
+                          <Button variant="outline" size="sm">Neutral tone</Button>
+                        </div>
+                        
+                        <Button onClick={handleAcceptAndCopy} className="w-full">
+                          Accept & Copy
+                        </Button>
                       </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        <p>No AI helper available for this issue yet.</p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Header Row */}
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        Developer
+                      </Badge>
+                      <div className="flex gap-2">
+                        <Button onClick={handleDevGenerate} size="sm">
+                          Generate
+                        </Button>
+                        {hasGenerated && (
+                          <Button variant="outline" size="sm">
+                            Regenerate
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Code Cards */}
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-medium text-gray-700">Current (Incorrect)</h4>
+                          <Button variant="ghost" size="sm">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <div className="border-l-2 border-red-500 bg-red-50 p-4 rounded-lg">
+                          <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto" style={{ fontFamily: 'PT Mono, monospace', fontSize: '14px' }}>
+                            {devCode.current}
+                          </pre>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-medium text-gray-700">Fixed (Correct)</h4>
+                          <Button variant="ghost" size="sm">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <div className="border-l-2 border-green-500 bg-green-50 p-4 rounded-lg">
+                          <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto" style={{ fontFamily: 'PT Mono, monospace', fontSize: '14px' }}>
+                            {devCode.fixed || "// Fixed code will appear here after generation"}
+                          </pre>
+                        </div>
+                      </div>
+                    </div>
+
+                    {devCode.fixed && (
+                      <div className="space-y-2">
+                        <div className="text-xs text-gray-500">
+                          Review before production. Use semantic elements when possible; avoid invalid aria-* on non-interactive elements.
+                        </div>
+                        <Button onClick={handleDevAcceptAndCopy} className="w-full">
+                          Accept & Copy
+                        </Button>
                       </div>
                     )}
                   </div>
                 )}
               </CardContent>
             </Card>
+
+            {/* Code Tab Bar */}
+            <CodeTabBar 
+              htmlContent={codeExamples.html}
+              cssContent={codeExamples.css}
+            />
 
             {/* Affected Pages */}
             <Card>
@@ -314,6 +403,36 @@ const IssueDetailNew: React.FC = () => {
 
           {/* Right Rail */}
           <div className="space-y-6">
+            {/* AI Fix Available */}
+            <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  AI Fix Available
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Badge className="bg-primary/10 text-primary border-primary/20">
+                    Images Helper
+                  </Badge>
+                  <p className="text-sm text-muted-foreground">
+                    AI can help generate solutions for this accessibility issue automatically.
+                  </p>
+                </div>
+                
+                <Button 
+                  className="w-full bg-primary hover:bg-primary-hover text-primary-foreground"
+                  asChild
+                >
+                  <Link to="/ai-helper">
+                    <Zap className="mr-2 h-4 w-4" />
+                    Open AI Helper
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
             {/* Why this matters */}
             <Card>
               <CardHeader>
@@ -329,7 +448,6 @@ const IssueDetailNew: React.FC = () => {
                 </ul>
               </CardContent>
             </Card>
-
 
             {/* WCAG Reference */}
             <Card>
@@ -404,7 +522,6 @@ const IssueDetailNew: React.FC = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

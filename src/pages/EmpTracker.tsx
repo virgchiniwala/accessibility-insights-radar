@@ -163,6 +163,9 @@ const EMPTracker: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline">Export to WOGAA CSV</Button>
+          <Button variant="outline" asChild>
+            <Link to="/reports">View Reports</Link>
+          </Button>
           <div className="flex items-center gap-2">
             <input 
               type="text" 

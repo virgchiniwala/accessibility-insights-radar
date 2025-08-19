@@ -11,7 +11,7 @@ const NotFound = () => {
       "404 Error: User attempted to access non-existent route:",
       location.pathname
     );
-    // Redirect to homepage after logging
+    // Redirect to homepage after 3 seconds
     const timer = setTimeout(() => {
       navigate("/");
     }, 3000);
