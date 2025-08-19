@@ -5,18 +5,39 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Copy, ExternalLink, Lightbulb, AlertTriangle, Users, Clock, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { AIHelperCard } from '@/components/AIHelperCard';
 import { ShareBrief } from '@/components/ShareBrief';
 import { GlossaryHover } from '@/components/GlossaryHover';
-import { CodeTabBar } from '@/components/CodeTabBar';
+import { useToast } from '@/hooks/use-toast';
 
 const IssueDetailNew: React.FC = () => {
   const [showShareBrief, setShowShareBrief] = useState(false);
-  const [showHelperModal, setShowHelperModal] = useState(false);
+  const [activeMainTab, setActiveMainTab] = useState<"guided" | "manual">("guided");
+  const [activeContextTab, setActiveContextTab] = useState<"html" | "css">("html");
+  const [fixedCode, setFixedCode] = useState("");
+  const [aiSuggestions, setAiSuggestions] = useState({
+    altText1: "Students collaborating in modern library space",
+    altText2: "Wireless headphones in matte black finish"
+  });
+  const { toast } = useToast();
 
-  const handleHelperModalAccepted = () => {
+  const handleApplySuggestions = () => {
+    // Copy AI suggestions to manual tab
+    const fixedHtml = `<img src="/hero-banner.jpg" alt="${aiSuggestions.altText1}" />
+<img src="/product-1.jpg" alt="${aiSuggestions.altText2}" class="product-image" />`;
+    setFixedCode(fixedHtml);
     setShowShareBrief(true);
-    setShowHelperModal(false);
+    toast({
+      title: "Suggestions applied",
+      description: "AI suggestions copied to Manual tab. Share with your team!"
+    });
+  };
+
+  const handleCodeCopy = async (code: string) => {
+    await navigator.clipboard.writeText(code);
+    toast({
+      title: "Copied to clipboard",
+      description: "Code has been copied successfully."
+    });
   };
 
   const issueData = {
@@ -131,16 +152,142 @@ const IssueDetailNew: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Code Example with Tab Bar */}
+            {/* Fix Workspace */}
             <Card>
               <CardHeader>
-                <CardTitle>Code Example</CardTitle>
+                <div className="flex items-center justify-between">
+                  <div className="flex space-x-1">
+                    <Button
+                      variant={activeMainTab === "guided" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setActiveMainTab("guided")}
+                      className="h-8"
+                    >
+                      Guided (AI)
+                    </Button>
+                    <Button
+                      variant={activeMainTab === "manual" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setActiveMainTab("manual")}
+                      className="h-8"
+                    >
+                      Manual
+                    </Button>
+                  </div>
+                  <div className="flex space-x-1">
+                    <Button
+                      variant={activeContextTab === "html" ? "outline" : "ghost"}
+                      size="sm"
+                      onClick={() => setActiveContextTab("html")}
+                      className="h-7 text-xs"
+                    >
+                      HTML Element
+                    </Button>
+                    <Button
+                      variant={activeContextTab === "css" ? "outline" : "ghost"}
+                      size="sm"
+                      onClick={() => setActiveContextTab("css")}
+                      className="h-7 text-xs"
+                    >
+                      CSS Path
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <CodeTabBar 
-                  htmlContent={codeExamples.html}
-                  cssContent={codeExamples.css}
-                />
+                {activeMainTab === "manual" ? (
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-medium text-gray-700">Current (Incorrect)</h4>
+                        <Button variant="ghost" size="sm" onClick={() => handleCodeCopy(activeContextTab === "html" ? codeExamples.html.split("<!-- Fixed -->")[0] : codeExamples.css)}>
+                          <Copy className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      <div className="border border-red-200 rounded-lg bg-red-50 p-4">
+                        <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto">
+                          {activeContextTab === "html" 
+                            ? codeExamples.html.split("<!-- Fixed -->")[0].replace("<!-- Current (Problematic) -->", "").trim()
+                            : codeExamples.css
+                          }
+                        </pre>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-medium text-gray-700">Fixed (Correct)</h4>
+                        <Button variant="ghost" size="sm" onClick={() => handleCodeCopy(fixedCode)}>
+                          <Copy className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      <div className="border border-green-200 rounded-lg bg-green-50 p-4">
+                        <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto">
+                          {fixedCode || (activeContextTab === "html" 
+                            ? codeExamples.html.split("<!-- Fixed -->")[1].trim()
+                            : "/* Fixed CSS will appear here after applying AI suggestions */"
+                          )}
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {/* AI Helper Editor */}
+                    {issueData.category === "Images" ? (
+                      <div className="space-y-4">
+                        <div className="p-4 bg-purple-50 rounded-lg">
+                          <h3 className="font-medium text-gray-900 mb-3">AI Suggested Alt Text</h3>
+                          <div className="space-y-3">
+                            <div className="p-3 bg-white rounded border">
+                              <div className="flex items-center space-x-3 mb-2">
+                                <img src="/api/placeholder/40/40" alt="" className="w-10 h-10 rounded border" />
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium">hero-banner.jpg</div>
+                                  <div className="text-xs text-gray-500">Current: (missing)</div>
+                                </div>
+                              </div>
+                              <textarea
+                                className="w-full p-2 border rounded text-sm"
+                                rows={2}
+                                value={aiSuggestions.altText1}
+                                onChange={(e) => setAiSuggestions({...aiSuggestions, altText1: e.target.value})}
+                                placeholder="AI suggested alt text..."
+                              />
+                            </div>
+                            <div className="p-3 bg-white rounded border">
+                              <div className="flex items-center space-x-3 mb-2">
+                                <img src="/api/placeholder/40/40" alt="" className="w-10 h-10 rounded border" />
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium">product-1.jpg</div>
+                                  <div className="text-xs text-gray-500">Current: (missing)</div>
+                                </div>
+                              </div>
+                              <textarea
+                                className="w-full p-2 border rounded text-sm"
+                                rows={2}
+                                value={aiSuggestions.altText2}
+                                onChange={(e) => setAiSuggestions({...aiSuggestions, altText2: e.target.value})}
+                                placeholder="AI suggested alt text..."
+                              />
+                            </div>
+                          </div>
+                          <div className="flex space-x-2 mt-4">
+                            <Button variant="outline" size="sm">
+                              Regenerate
+                            </Button>
+                            <Button size="sm" onClick={handleApplySuggestions}>
+                              Apply Suggestions
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>No AI helper available for this issue yet.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -167,62 +314,22 @@ const IssueDetailNew: React.FC = () => {
 
           {/* Right Rail */}
           <div className="space-y-6">
-            {/* AI Helper Card */}
-            <AIHelperCard 
-              hasHelper={true}
-              issueType="Alt Text"
-              onOpenHelper={() => setShowHelperModal(true)}
-            />
-
-            {/* Step-by-Step Guide */}
+            {/* Why this matters */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  <span>Step-by-Step Guide</span>
+                  <AlertTriangle className="w-5 h-5 text-blue-500" />
+                  <span>Why this matters</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-semibold">
-                      1
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Identify images</h4>
-                      <p className="text-sm text-gray-600">Locate all images missing alt attributes</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-semibold">
-                      2
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Write descriptions</h4>
-                      <p className="text-sm text-gray-600">Create concise, meaningful alt text</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-semibold">
-                      3
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Add alt attributes</h4>
-                      <p className="text-sm text-gray-600">Update HTML with alt text</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-semibold">
-                      4
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Test & validate</h4>
-                      <p className="text-sm text-gray-600">Verify with screen readers</p>
-                    </div>
-                  </div>
-                </div>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li>• Screen reader users cannot understand image content without alt text</li>
+                  <li>• Search engines rely on alt text to index and categorize images</li>
+                </ul>
               </CardContent>
             </Card>
+
 
             {/* WCAG Reference */}
             <Card>
@@ -298,67 +405,6 @@ const IssueDetailNew: React.FC = () => {
         </div>
       </div>
 
-      {/* AI Helper Modal */}
-      {showHelperModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                ✨ AI-Suggested Fix
-              </h2>
-              <p className="text-sm text-gray-600">
-                AI analysed 24 items – est. time saved ≈ 72 min.
-              </p>
-            </div>
-            
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="p-4 bg-purple-50 rounded-lg">
-                  <h3 className="font-medium text-gray-900 mb-2">Suggested Alt Text</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">hero-banner.jpg</span>
-                      <span className="text-gray-900">"Students collaborating in modern library space"</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">product-1.jpg</span>
-                      <span className="text-gray-900">"Wireless headphones in matte black finish"</span>
-                    </div>
-                    <div className="text-center text-gray-500 py-2">
-                      ... and 22 more suggestions
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 border-t bg-gray-50 flex justify-between items-center">
-              <div className="flex space-x-4">
-                <button className="text-sm text-gray-600 hover:text-gray-800">
-                  👍 Helpful
-                </button>
-                <button className="text-sm text-gray-600 hover:text-gray-800">
-                  👎 Not helpful
-                </button>
-              </div>
-              <div className="flex space-x-3">
-                <Button 
-                  variant="ghost" 
-                  onClick={() => setShowHelperModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button variant="outline">
-                  Regenerate
-                </Button>
-                <Button onClick={handleHelperModalAccepted}>
-                  Apply Suggestions
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
