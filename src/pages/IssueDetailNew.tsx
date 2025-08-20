@@ -187,85 +187,72 @@ const IssueDetailNew: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content - Left 2 Columns */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Context Bar */}
-            <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
-              <div className="flex space-x-2">
-                <Button
-                  variant={activeContextTab === "html" ? "outline" : "ghost"}
-                  size="sm"
-                  onClick={() => setActiveContextTab("html")}
-                  className="h-8 text-xs"
-                >
-                  HTML Element
-                </Button>
-                <Button
-                  variant={activeContextTab === "css" ? "outline" : "ghost"}
-                  size="sm"
-                  onClick={() => setActiveContextTab("css")}
-                  className="h-8 text-xs"
-                >
-                  CSS Path
-                </Button>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(
-                  activeContextTab === "html" ? codeExamples.html : codeExamples.css,
-                  activeContextTab === "html" ? "HTML Element" : "CSS Path"
-                )}
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
-
-            {activeContextTab === "html" && (
-              <Card>
-                <CardContent className="pt-4">
-                  <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto bg-gray-50 p-4 rounded">
-                    {codeExamples.html}
-                  </pre>
-                </CardContent>
-              </Card>
-            )}
-
-            {activeContextTab === "css" && (
-              <Card>
-                <CardContent className="pt-4">
-                  <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto bg-gray-50 p-4 rounded">
-                    {codeExamples.css}
-                  </pre>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Fix Workspace */}
             <Card>
               <CardHeader>
-                <div className="flex space-x-1">
-                  <Button
-                    variant={activeMainTab === "content" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setActiveMainTab("content")}
-                    className="h-8"
-                    role="tab"
-                    aria-selected={activeMainTab === "content"}
-                  >
-                    Content (AI)
-                  </Button>
-                  <Button
-                    variant={activeMainTab === "dev" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setActiveMainTab("dev")}
-                    className="h-8"
-                    role="tab"
-                    aria-selected={activeMainTab === "dev"}
-                  >
-                    Dev (AI)
-                  </Button>
+                <div className="flex items-center justify-between">
+                  <div className="flex space-x-1">
+                    <Button
+                      variant={activeMainTab === "content" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setActiveMainTab("content")}
+                      className="h-8"
+                      role="tab"
+                      aria-selected={activeMainTab === "content"}
+                    >
+                      Content (AI)
+                    </Button>
+                    <Button
+                      variant={activeMainTab === "dev" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setActiveMainTab("dev")}
+                      className="h-8"
+                      role="tab"
+                      aria-selected={activeMainTab === "dev"}
+                    >
+                      Dev (AI)
+                    </Button>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                      <Button
+                        variant={activeContextTab === "html" ? "outline" : "ghost"}
+                        size="sm"
+                        onClick={() => setActiveContextTab("html")}
+                        className="h-7 text-xs"
+                      >
+                        HTML Element
+                      </Button>
+                      <Button
+                        variant={activeContextTab === "css" ? "outline" : "ghost"}
+                        size="sm"
+                        onClick={() => setActiveContextTab("css")}
+                        className="h-7 text-xs"
+                      >
+                        CSS Path
+                      </Button>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(
+                        activeContextTab === "html" ? codeExamples.html : codeExamples.css,
+                        activeContextTab === "html" ? "HTML Element" : "CSS Path"
+                      )}
+                      className="h-7"
+                    >
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
+                {/* Context Code Display */}
+                <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                  <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto">
+                    {activeContextTab === "html" ? codeExamples.html : codeExamples.css}
+                  </pre>
+                </div>
                 {activeMainTab === "content" ? (
                   <div className="space-y-4">
                     {/* Filter chips */}
