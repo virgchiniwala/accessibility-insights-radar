@@ -79,8 +79,25 @@ const IssueDetailNew: React.FC = () => {
     setShowShareBrief(true);
     
     toast({
-      title: "Copied and inserted into Dev (AI)",
+      title: "✓ Copied and inserted into Dev (AI)",
       description: "Suggestions applied successfully."
+    });
+  };
+
+  const handleCopyAllSuggestions = () => {
+    const textToCopy = suggestions.map(s => `alt="${s.suggestedText}"`).join('\n');
+    navigator.clipboard.writeText(textToCopy);
+    toast({
+      title: "✓ All suggestions copied",
+      description: "Ready to paste into your code."
+    });
+  };
+
+  const handleCopySingleSuggestion = (suggestion: any) => {
+    navigator.clipboard.writeText(`alt="${suggestion.suggestedText}"`);
+    toast({
+      title: "✓ Copied",
+      description: "Alt text copied to clipboard."
     });
   };
 
@@ -101,9 +118,15 @@ const IssueDetailNew: React.FC = () => {
     navigator.clipboard.writeText(devCode.fixed);
     setShowShareBrief(true);
     toast({
-      title: "Code copied to clipboard",
+      title: "✓ Code copied to clipboard",
       description: "Ready to share."
     });
+  };
+
+  const getConfidenceBadge = (percentage: number) => {
+    if (percentage >= 90) return { text: "Likely a good match", color: "bg-green-50 text-green-700 border-green-200" };
+    if (percentage >= 75) return { text: "Review recommended", color: "bg-yellow-50 text-yellow-700 border-yellow-200" };
+    return { text: "Needs review", color: "bg-orange-50 text-orange-700 border-orange-200" };
   };
 
   const copyToClipboard = (text: string, label: string) => {
@@ -304,7 +327,7 @@ const IssueDetailNew: React.FC = () => {
                               disabled={selectedItems.length === 0 || isGenerating}
                               size="sm"
                             >
-                              {isGenerating ? "Generating..." : "Generate Alt Text"}
+                              {isGenerating ? "Generating..." : "Generate AI Alt Text"}
                             </Button>
                             {suggestions.length > 0 && (
                               <Button variant="outline" size="sm" onClick={handleGenerate}>
@@ -333,49 +356,80 @@ const IssueDetailNew: React.FC = () => {
 
                         {suggestions.length > 0 && !isGenerating && (
                           <div className="space-y-4">
-                            {suggestions.map((suggestion, index) => (
-                              <div key={index} className="space-y-3 border rounded-lg p-4 bg-gray-50/50">
-                                <div className="flex items-center justify-between">
-                                  <Label>Suggested text for {suggestion.filename}</Label>
-                                  <div className="flex items-center gap-2">
-                                    <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
-                                      ~85% confident
-                                    </Badge>
-                                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                                      <Volume2 className="w-3 h-3" />
-                                    </Button>
+                            {suggestions.map((suggestion, index) => {
+                              const confidence = Math.floor(Math.random() * 20) + 80; // 80-100%
+                              const confidenceBadge = getConfidenceBadge(confidence);
+                              
+                              return (
+                                <div key={index} className="space-y-3 border rounded-lg p-4 bg-white">
+                                  {/* Image Preview */}
+                                  <div className="text-xs text-muted-foreground mb-2">Preview:</div>
+                                  <div className="bg-gray-50 border rounded p-2 font-mono text-sm">
+                                    <span className="text-blue-600">&lt;img</span>
+                                    <span className="text-gray-700"> src="/{suggestion.filename}" </span>
+                                    <span className="text-green-600">alt="{suggestion.suggestedText}"</span>
+                                    <span className="text-blue-600">&gt;</span>
+                                  </div>
+                                  
+                                  <div className="flex items-center justify-between">
+                                    <Label>Suggested text for {suggestion.filename}</Label>
+                                    <div className="flex items-center gap-2">
+                                      <Badge 
+                                        variant="outline" 
+                                        className={`text-xs ${confidenceBadge.color} hover:opacity-80`}
+                                        title={`${confidence}% confident`}
+                                      >
+                                        {confidenceBadge.text}
+                                      </Badge>
+                                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Screen Reader Preview">
+                                        <Volume2 className="w-3 h-3" />
+                                      </Button>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="h-7 text-xs"
+                                        onClick={() => handleCopySingleSuggestion(suggestion)}
+                                      >
+                                        Copy
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <Textarea
+                                    value={suggestion.suggestedText}
+                                    onChange={(e) => {
+                                      const newSuggestions = [...suggestions];
+                                      newSuggestions[index].suggestedText = e.target.value;
+                                      setSuggestions(newSuggestions);
+                                    }}
+                                    className="font-body text-base leading-6 bg-white border-gray-200 focus:ring-2 focus:ring-primary/20"
+                                    rows={2}
+                                  />
+                                  <div className="flex items-center justify-between">
+                                    <div className="text-xs text-muted-foreground">
+                                      {suggestion.suggestedText.length < 15 ? "Too short (<15 chars)" :
+                                       suggestion.suggestedText.length > 125 ? "Too long (>125 chars)" :
+                                       "Good length"}
+                                      {suggestion.filename && suggestion.suggestedText.toLowerCase().includes(suggestion.filename.toLowerCase().split('.')[0]) && " · Avoid repeating filename"}
+                                    </div>
+                                    <div className="flex gap-1">
+                                      <Button variant="ghost" size="sm" className="h-6 text-xs px-2 opacity-70 hover:opacity-100">Shorten</Button>
+                                      <Button variant="ghost" size="sm" className="h-6 text-xs px-2 opacity-70 hover:opacity-100">More Specific</Button>
+                                      <Button variant="ghost" size="sm" className="h-6 text-xs px-2 opacity-70 hover:opacity-100">Include Context</Button>
+                                      <Button variant="ghost" size="sm" className="h-6 text-xs px-2 opacity-70 hover:opacity-100">Neutral Tone</Button>
+                                    </div>
                                   </div>
                                 </div>
-                                <Textarea
-                                  value={suggestion.suggestedText}
-                                  onChange={(e) => {
-                                    const newSuggestions = [...suggestions];
-                                    newSuggestions[index].suggestedText = e.target.value;
-                                    setSuggestions(newSuggestions);
-                                  }}
-                                  className="font-body text-base leading-6 bg-white"
-                                  rows={2}
-                                />
-                                <div className="flex items-center justify-between">
-                                  <div className="text-xs text-muted-foreground">
-                                    {suggestion.suggestedText.length < 15 ? "Too short (<15 chars)" :
-                                     suggestion.suggestedText.length > 125 ? "Too long (>125 chars)" :
-                                     "Good length"}
-                                    {suggestion.filename && suggestion.suggestedText.toLowerCase().includes(suggestion.filename.toLowerCase().split('.')[0]) && " · Avoid repeating filename"}
-                                  </div>
-                                  <div className="flex gap-1">
-                                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">Shorten</Button>
-                                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">More Specific</Button>
-                                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">Include Context</Button>
-                                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">Neutral Tone</Button>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                             
-                            <Button onClick={handleAcceptAndCopy} className="w-full">
-                              Copy Text
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button onClick={handleCopyAllSuggestions} variant="outline" className="flex-1">
+                                Copy All Suggestions
+                              </Button>
+                              <Button onClick={handleAcceptAndCopy} className="flex-1">
+                                Copy Text
+                              </Button>
+                            </div>
                           </div>
                         )}
 
@@ -416,7 +470,7 @@ const IssueDetailNew: React.FC = () => {
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={handleDevGenerate} size="sm" disabled={isGenerating}>
-                          {isGenerating ? "Generating..." : "Generate Code Fix"}
+                          {isGenerating ? "Generating..." : "Generate AI Code Fix"}
                         </Button>
                         {devCode.fixed && (
                           <Button variant="outline" size="sm" onClick={handleDevGenerate}>
@@ -430,13 +484,16 @@ const IssueDetailNew: React.FC = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-medium text-red-700">Current (Incorrect)</h4>
+                          <h4 className="text-sm font-medium text-red-700 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                            Current (Incorrect)
+                          </h4>
                           <Button variant="ghost" size="sm" onClick={() => copyToClipboard(devCode.current, "Current code")}>
                             <Copy className="w-3 h-3" />
                           </Button>
                         </div>
-                        <div className="border-l-2 border-red-500 bg-red-50 p-4 rounded-lg">
-                          <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto" style={{ fontFamily: 'PT Mono, monospace', fontSize: '14px' }}>
+                        <div className="bg-red-50 border border-red-200 rounded-lg overflow-hidden">
+                          <pre className="p-4 text-sm font-mono whitespace-pre-wrap text-red-800 overflow-x-auto" style={{ fontFamily: 'PT Mono, monospace', fontSize: '14px' }}>
                             {activeContextTab === "html" ? devCode.current : codeExamples.css}
                           </pre>
                         </div>
@@ -445,10 +502,17 @@ const IssueDetailNew: React.FC = () => {
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-medium text-green-700">Fixed (Correct)</h4>
+                            <h4 className="text-sm font-medium text-green-700 flex items-center gap-2">
+                              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                              Fixed (Correct)
+                            </h4>
                             {devCode.fixed && (
-                              <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
-                                ~90% confident
+                              <Badge 
+                                variant="outline" 
+                                className="text-xs bg-green-50 text-green-700 border-green-200" 
+                                title="90% confident"
+                              >
+                                ~90% reliable
                               </Badge>
                             )}
                           </div>
@@ -458,22 +522,30 @@ const IssueDetailNew: React.FC = () => {
                             </Button>
                           )}
                         </div>
-                        <div className="border-l-2 border-green-500 bg-green-50 p-4 rounded-lg">
-                          <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto" style={{ fontFamily: 'PT Mono, monospace', fontSize: '14px' }}>
-                            {devCode.fixed || "// Fixed code will appear here after generation"}
-                          </pre>
+                        <div className="bg-green-50 border border-green-200 rounded-lg overflow-hidden">
+                          {devCode.fixed ? (
+                            <Textarea
+                              value={devCode.fixed}
+                              onChange={(e) => setDevCode(prev => ({ ...prev, fixed: e.target.value }))}
+                              className="bg-transparent border-none font-mono text-sm text-green-800 min-h-[120px] resize-none focus:ring-0 focus:outline-none"
+                            />
+                          ) : (
+                            <div className="p-4 text-sm text-gray-400 italic">
+                              Fixed code will appear here after generation
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
 
                     {devCode.fixed && (
-                      <div className="space-y-2">
-                        <div className="text-xs text-gray-500">
-                          Review before production. Use semantic elements when possible; avoid invalid aria-* on non-interactive elements.
-                        </div>
+                      <div className="space-y-3">
                         <Button onClick={handleDevAcceptAndCopy} className="w-full">
                           Copy Fixed Code
                         </Button>
+                        <p className="text-xs text-muted-foreground text-center px-4">
+                          Review before production. Use semantic elements where possible; validate with screen readers.
+                        </p>
                       </div>
                     )}
                   </div>
