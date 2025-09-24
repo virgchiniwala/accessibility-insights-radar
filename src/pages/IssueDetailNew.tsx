@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Copy, ExternalLink, AlertTriangle, Users, Clock, ChevronRight, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Copy, ExternalLink, AlertTriangle, Users, Clock, ChevronRight, ChevronDown, Volume2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ShareBrief } from '@/components/ShareBrief';
 import { GlossaryHover } from '@/components/GlossaryHover';
@@ -191,27 +191,34 @@ const IssueDetailNew: React.FC = () => {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div className="flex space-x-1">
-                    <Button
-                      variant={activeMainTab === "content" ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setActiveMainTab("content")}
-                      className="h-8"
-                      role="tab"
-                      aria-selected={activeMainTab === "content"}
-                    >
-                      Content (AI)
-                    </Button>
-                    <Button
-                      variant={activeMainTab === "dev" ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setActiveMainTab("dev")}
-                      className="h-8"
-                      role="tab"
-                      aria-selected={activeMainTab === "dev"}
-                    >
-                      Dev (AI)
-                    </Button>
+                  <div className="space-y-2">
+                    <div className="flex space-x-1">
+                      <Button
+                        variant={activeMainTab === "content" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setActiveMainTab("content")}
+                        className="h-8"
+                        role="tab"
+                        aria-selected={activeMainTab === "content"}
+                      >
+                        Content AI (for Business Users)
+                      </Button>
+                      <Button
+                        variant={activeMainTab === "dev" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setActiveMainTab("dev")}
+                        className="h-8"
+                        role="tab"
+                        aria-selected={activeMainTab === "dev"}
+                      >
+                        Dev AI (for Developers)
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {activeMainTab === "content" 
+                        ? "AI-suggested fixes for non-technical users (e.g. alt text)."
+                        : "AI-generated code fixes for developers."}
+                    </p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="flex space-x-1">
@@ -247,12 +254,6 @@ const IssueDetailNew: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Context Code Display */}
-                <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                  <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto">
-                    {activeContextTab === "html" ? codeExamples.html : codeExamples.css}
-                  </pre>
-                </div>
                 {activeMainTab === "content" ? (
                   <div className="space-y-4">
                     {/* Filter chips */}
@@ -303,7 +304,7 @@ const IssueDetailNew: React.FC = () => {
                               disabled={selectedItems.length === 0 || isGenerating}
                               size="sm"
                             >
-                              {isGenerating ? "Generating..." : "Generate"}
+                              {isGenerating ? "Generating..." : "Generate Alt Text"}
                             </Button>
                             {suggestions.length > 0 && (
                               <Button variant="outline" size="sm" onClick={handleGenerate}>
@@ -333,8 +334,18 @@ const IssueDetailNew: React.FC = () => {
                         {suggestions.length > 0 && !isGenerating && (
                           <div className="space-y-4">
                             {suggestions.map((suggestion, index) => (
-                              <div key={index} className="space-y-2">
-                                <Label>Suggested text for {suggestion.filename}</Label>
+                              <div key={index} className="space-y-3 border rounded-lg p-4 bg-gray-50/50">
+                                <div className="flex items-center justify-between">
+                                  <Label>Suggested text for {suggestion.filename}</Label>
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                                      ~85% confident
+                                    </Badge>
+                                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                                      <Volume2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                </div>
                                 <Textarea
                                   value={suggestion.suggestedText}
                                   onChange={(e) => {
@@ -342,27 +353,28 @@ const IssueDetailNew: React.FC = () => {
                                     newSuggestions[index].suggestedText = e.target.value;
                                     setSuggestions(newSuggestions);
                                   }}
-                                  className="font-body text-base leading-6"
+                                  className="font-body text-base leading-6 bg-white"
                                   rows={2}
                                 />
-                                <div className="text-xs text-muted-foreground">
-                                  {suggestion.suggestedText.length < 15 ? "Too short (<15 chars)" :
-                                   suggestion.suggestedText.length > 125 ? "Too long (>125 chars)" :
-                                   "Good length"}
-                                  {suggestion.filename && suggestion.suggestedText.toLowerCase().includes(suggestion.filename.toLowerCase().split('.')[0]) && " · Avoid repeating filename"}
+                                <div className="flex items-center justify-between">
+                                  <div className="text-xs text-muted-foreground">
+                                    {suggestion.suggestedText.length < 15 ? "Too short (<15 chars)" :
+                                     suggestion.suggestedText.length > 125 ? "Too long (>125 chars)" :
+                                     "Good length"}
+                                    {suggestion.filename && suggestion.suggestedText.toLowerCase().includes(suggestion.filename.toLowerCase().split('.')[0]) && " · Avoid repeating filename"}
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">Shorten</Button>
+                                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">More Specific</Button>
+                                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">Include Context</Button>
+                                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">Neutral Tone</Button>
+                                  </div>
                                 </div>
                               </div>
                             ))}
                             
-                            <div className="flex gap-2 flex-wrap">
-                              <Button variant="outline" size="sm">Shorten</Button>
-                              <Button variant="outline" size="sm">More specific</Button>
-                              <Button variant="outline" size="sm">Include context</Button>
-                              <Button variant="outline" size="sm">Neutral tone</Button>
-                            </div>
-                            
                             <Button onClick={handleAcceptAndCopy} className="w-full">
-                              Accept & Copy
+                              Copy Text
                             </Button>
                           </div>
                         )}
@@ -379,12 +391,32 @@ const IssueDetailNew: React.FC = () => {
                   <div className="space-y-4">
                     {/* Header Row */}
                     <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                        Developer
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          Developer
+                        </Badge>
+                        <div className="flex space-x-1">
+                          <Button
+                            variant={activeContextTab === "html" ? "outline" : "ghost"}
+                            size="sm"
+                            onClick={() => setActiveContextTab("html")}
+                            className="h-7 text-xs"
+                          >
+                            HTML Element
+                          </Button>
+                          <Button
+                            variant={activeContextTab === "css" ? "outline" : "ghost"}
+                            size="sm"
+                            onClick={() => setActiveContextTab("css")}
+                            className="h-7 text-xs"
+                          >
+                            CSS Path
+                          </Button>
+                        </div>
+                      </div>
                       <div className="flex gap-2">
                         <Button onClick={handleDevGenerate} size="sm" disabled={isGenerating}>
-                          {isGenerating ? "Generating..." : "Generate"}
+                          {isGenerating ? "Generating..." : "Generate Code Fix"}
                         </Button>
                         {devCode.fixed && (
                           <Button variant="outline" size="sm" onClick={handleDevGenerate}>
@@ -394,25 +426,32 @@ const IssueDetailNew: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Code Cards */}
-                    <div className="space-y-4">
+                    {/* Side by Side Code Blocks */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-medium text-gray-700">Current (Incorrect)</h4>
+                          <h4 className="text-sm font-medium text-red-700">Current (Incorrect)</h4>
                           <Button variant="ghost" size="sm" onClick={() => copyToClipboard(devCode.current, "Current code")}>
                             <Copy className="w-3 h-3" />
                           </Button>
                         </div>
                         <div className="border-l-2 border-red-500 bg-red-50 p-4 rounded-lg">
                           <pre className="text-sm font-mono whitespace-pre-wrap text-gray-800 overflow-x-auto" style={{ fontFamily: 'PT Mono, monospace', fontSize: '14px' }}>
-                            {devCode.current}
+                            {activeContextTab === "html" ? devCode.current : codeExamples.css}
                           </pre>
                         </div>
                       </div>
 
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-medium text-gray-700">Fixed (Correct)</h4>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-medium text-green-700">Fixed (Correct)</h4>
+                            {devCode.fixed && (
+                              <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                                ~90% confident
+                              </Badge>
+                            )}
+                          </div>
                           {devCode.fixed && (
                             <Button variant="ghost" size="sm" onClick={() => copyToClipboard(devCode.fixed, "Fixed code")}>
                               <Copy className="w-3 h-3" />
@@ -433,7 +472,7 @@ const IssueDetailNew: React.FC = () => {
                           Review before production. Use semantic elements when possible; avoid invalid aria-* on non-interactive elements.
                         </div>
                         <Button onClick={handleDevAcceptAndCopy} className="w-full">
-                          Accept & Copy
+                          Copy Fixed Code
                         </Button>
                       </div>
                     )}
